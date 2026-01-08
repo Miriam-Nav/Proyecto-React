@@ -12,7 +12,7 @@ const theme = {
     successSoft: "#dcfce7",
     errorSoft: "#fee2e2",
 
-    background: "#c3bcedff",     
+    background: "#dad5f5ff",     
     text: "#2b1f47",           
     inputText: "#564b6dff",    
     placeholder: "#998eb1ff",  
@@ -20,7 +20,7 @@ const theme = {
     surface: "#FFFFFF",        
     backgroundCard: "#f4f1f9ff", 
 
-    outline: "#d6cbfaff",      
+    outline: "#ccc0f4ff",      
   },
 
   fonts: {
