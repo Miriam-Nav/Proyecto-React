@@ -44,9 +44,7 @@ export default function ClientesScreen() {
   const clientesFiltrados = clientes.filter((c) => {
     const texto = busqueda.toLowerCase();
     return (
-      c.nombre.toLowerCase().includes(texto) ||
-      (c.email?.toLowerCase().includes(texto) ?? false) ||
-      (c.telefono?.toLowerCase().includes(texto) ?? false)
+      c.nombre.toLowerCase().includes(texto)
     );
   });
 
