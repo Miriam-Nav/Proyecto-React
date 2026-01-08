@@ -1,18 +1,35 @@
 const theme = {
   colors: {
-    primary: '#100f13ff', 
-    onPrimary: '#FFFFFF',      
-    secondary: '#eac50dff',
-    onSecondary: '#100f13ff',
-    error: '#B00020',     
-    background: '#333333',
-    text: '#333333',
-    inputText: '#666666',
-    placeholder: '#999999',
-    surface: '#FFFFFF',
-    backgroundCard: '#FFFFFF',
-    outline: '#D1D5DB',
+    primary: "#510fdfff",        
+    onPrimary: "#FFFFFF",
+
+    secondary: "#2563eb",      
+    onSecondary: "#0a0a0a",
+
+    error: "#e72c2cff",          
+    success: "#10b981",   
+    
+    successSoft: "#dcfce7",
+    errorSoft: "#fee2e2",
+
+    background: "#c3bcedff",     
+    text: "#2b1f47",           
+    inputText: "#564b6dff",    
+    placeholder: "#998eb1ff",  
+
+    surface: "#FFFFFF",        
+    backgroundCard: "#f4f1f9ff", 
+
+    outline: "#d6cbfaff",      
+  },
+
+  fonts: {
+    regular: "monospace",
+    bold: "monospace",
   },
 };
 
 export default theme;
+
+
+
