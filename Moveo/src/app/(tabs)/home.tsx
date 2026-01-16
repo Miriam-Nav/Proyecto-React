@@ -4,7 +4,6 @@ import theme from "../../theme";
 
 export default function HomeScreen() {
   return (
-    //  Carpeta tsconfig para quitar los ../../
     <View style={styles.screen}>
       <Text style={styles.title}>Hola Usuario! </Text>
     </View>
