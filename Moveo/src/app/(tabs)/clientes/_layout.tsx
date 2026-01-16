@@ -1,11 +1,11 @@
 import { Stack } from "expo-router";
 
-export default function RootLayout() {
+export default function ClientesLayout() {
   return (
     
     <Stack>
       <Stack.Screen 
-        name="clientes" 
+        name="index" 
         options={{ 
           headerShown: false 
         }}
@@ -13,19 +13,19 @@ export default function RootLayout() {
 
       {/* Detalle de cliente */}
       <Stack.Screen
-        name="clientes/[id]"
+        name="[id]"
         options={{ title: "Detalle Cliente" }}
       />
 
       {/* Pantalla de edición */}
       <Stack.Screen
-        name="clientes/editar"
+        name="editar"
         options={{ title: "Editar Cliente", headerShown: false }}
       />
 
       {/* Pantalla de nuevo cliente */}
       <Stack.Screen
-        name="clientes/nuevo"
+        name="nuevo"
         options={{ title: "Nuevo Cliente", headerShown: false  }}
       />
 
