@@ -1,76 +1,102 @@
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   Pressable,
+  ActivityIndicator,
   ScrollView,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { crearCliente } from "../../services/clienteService";
-import { ClienteFormValues, ClienteSchema } from "../../schemas/auth.schema";
-import theme from "../../theme";
 
-export default function NuevoCliente() {
+import { obtenerClientePorId, actualizarCliente } from "../../../services/clienteService";
+import { ClienteFormValues, ClienteSchema } from "../../../schemas/cliente.schema";
+import theme from "../../../theme";
+
+export default function EditarCliente() {
+  const { id } = useLocalSearchParams<{ id?: string | string[] }>();
   const router = useRouter();
+  const [cargando, setCargando] = useState(true);
 
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ClienteFormValues>({
-    // Zod valida el formulario
     resolver: zodResolver(ClienteSchema),
-
-    // Valores iniciales del formulario
     defaultValues: {
       nombre: "",
       email: "",
       telefono: "",
     },
-
     mode: "onBlur",
   });
 
+  // Cargar datos del cliente
+  useEffect(() => {
+    const cargar = async () => {
+      const idNum = Number(Array.isArray(id) ? id[0] : id);
+      const data = await obtenerClientePorId(idNum);
 
-  // Crea el cliente
-  const onSubmit =  async (data: ClienteFormValues) => {
-    await crearCliente({
-          id: Date.now(),
-          nombre: data.nombre,
-          email: data.email || "",
-          telefono: data.telefono || "",
-          activo: true,
-        });
-    router.back(); 
+      if (data) {
+        setValue("nombre", data.nombre);
+        setValue("email", data.email ?? "");
+        setValue("telefono", data.telefono ?? "");
+      }
+
+      setCargando(false);
+    };
+
+    cargar();
+  }, [id]);
+
+  // Guardar cambios
+  const onSubmit = async (data: ClienteFormValues) => {
+    const idNum = Number(Array.isArray(id) ? id[0] : id);
+
+    await actualizarCliente(idNum, {
+      nombre: data.nombre,
+      email: data.email || "",
+      telefono: data.telefono || "",
+    });
+
+    router.back();
   };
+
+  if (cargando) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color={theme.colors.secondary} />
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.screen}>
       <View style={styles.container}>
-        <Text style={styles.title}>Nuevo Cliente</Text>
+        <Text style={styles.title}>Editar Cliente</Text>
 
         {/* -------- NOMBRE -------- */}
         <Controller
-          control={control} 
-          name="nombre"     
+          control={control}
+          name="nombre"
           render={({ field }) => (
             <TextInput
-              style={[ 
+              style={[
                 styles.input,
-                // Si hay error pone borde rojo
                 errors.nombre ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Nombre"
-              value={field.value} 
-              onChangeText={field.onChange} 
-              onBlur={field.onBlur} 
+              value={field.value}
+              onChangeText={field.onChange}
+              onBlur={field.onBlur}
             />
           )}
         />
-        {/* Mensaje de error */}
         {errors.nombre && (
           <Text style={styles.error}>{errors.nombre.message}</Text>
         )}
@@ -122,9 +148,8 @@ export default function NuevoCliente() {
 
         {/* -------- BOTONES -------- */}
         <View style={styles.buttons}>
-          {/* handleSubmit valida con Zod y luego ejecuta onSubmit */}
           <Pressable style={styles.btnPrimary} onPress={handleSubmit(onSubmit)}>
-            <Text style={styles.btnText}>Crear Cliente</Text>
+            <Text style={styles.btnText}>Guardar Cambios</Text>
           </Pressable>
 
           <Pressable style={styles.btnSecondary} onPress={() => router.back()}>
@@ -144,7 +169,12 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
     padding: 10,
   },
-
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: theme.colors.background,
+  },
   container: {
     backgroundColor: theme.colors.surface,
     borderRadius: 12,
@@ -153,7 +183,6 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.outline,
     margin: 20,
   },
-
   title: {
     fontSize: 22,
     fontWeight: "bold",
@@ -162,7 +191,6 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     textAlign: "center",
   },
-
   input: {
     backgroundColor: theme.colors.surface,
     borderWidth: 3,
@@ -174,20 +202,17 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
     fontSize: 16,
   },
-
   error: {
     color: theme.colors.error,
     fontFamily: "monospace",
     marginBottom: 10,
   },
-
   buttons: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
     marginTop: 20,
   },
-
   btnPrimary: {
     flex: 1,
     backgroundColor: theme.colors.primary,
@@ -199,7 +224,6 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: theme.colors.primary,
   },
-
   btnSecondary: {
     flex: 1,
     backgroundColor: theme.colors.surface,
@@ -211,7 +235,6 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: theme.colors.primary,
   },
-
   btnText: {
     color: theme.colors.onPrimary,
     fontWeight: "bold",

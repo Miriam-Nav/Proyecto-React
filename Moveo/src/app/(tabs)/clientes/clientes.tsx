@@ -9,9 +9,9 @@ import {
   TextInput,
 } from "react-native";
 import { Link, useFocusEffect } from "expo-router";
-import { obtenerClientes } from "../../services/clienteService";
-import { Cliente } from "../../types/mockApi";
-import theme from "../../theme";
+import { obtenerClientes } from "../../../services/clienteService";
+import { Cliente } from "../../../types/mockApi";
+import theme from "../../../theme";
 
 export default function ClientesScreen() {
   const [clientes, setClientes] = useState<Cliente[]>([]);

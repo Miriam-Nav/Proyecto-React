@@ -15,6 +15,8 @@ export default function LoginScreen() {
     router.replace("/(tabs)/home");
   };
 
+  
+
   return (
     <ScrollView 
       contentContainerStyle={styles.screen}

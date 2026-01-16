@@ -10,6 +10,7 @@ export default function TabsLayout() {
         name="home"
         options={{
           title: "Inicio",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome name="home" size={22} color={color} />
           ),
@@ -20,12 +21,12 @@ export default function TabsLayout() {
         name="clientes"
         options={{
           title: "Clientes",
+          headerShown: false,
           tabBarIcon: ({ color }) => (
             <FontAwesome name="users" size={22} color={color} />
           ),
         }}
       />
-
     </Tabs>
   );
 

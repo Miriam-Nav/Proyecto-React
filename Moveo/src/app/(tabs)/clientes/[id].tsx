@@ -19,9 +19,9 @@ import {
   eliminarCliente,
   obtenerClientePorId,
   obtenerPedidosPorCliente,
-} from "../../services/clienteService";
-import { Cliente, Pedido } from "../../types/mockApi";
-import theme from "../../theme";
+} from "../../../services/clienteService";
+import { Cliente, Pedido } from "../../../types/mockApi";
+import theme from "../../../theme";
 
 export default function ClienteDetalle() {
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
@@ -152,44 +152,50 @@ export default function ClienteDetalle() {
 
         {/* BOTONES */}
         <View style={styles.buttons}>
-          <Link
-            href={{ 
-              pathname: "/clientes/editar", 
-              params: { id: cliente.id } 
+
+          {/* EDITAR */}
+          <Pressable
+            style={styles.btnPrimary}
+            onPress={() => {
+              router.push({
+                pathname: "/clientes/editar",
+                params: { id: cliente.id }
+              });
             }}
-            asChild
           >
-            <Pressable style={styles.btnPrimary}>
-              <Text style={styles.btnText}>Editar Cliente</Text>
-            </Pressable>
-          </Link>
+            <Text style={styles.btnText}>Editar Cliente</Text>
+          </Pressable>
 
-          <Link
-            href={{
-              pathname: "/clientes/modal",
-              params: { id: cliente.id, nombre: cliente.nombre },
+          {/* GESTIONAR ESTADO */}
+          <Pressable
+            style={styles.btnSecondary}
+            onPress={() => {
+              router.push({
+                pathname: "/clientes/modal",
+                params: { id: cliente.id, nombre: cliente.nombre }
+              });
             }}
-            asChild
           >
-            <Pressable style={styles.btnSecondary}>
-              <Text style={[styles.btnText, { color: theme.colors.primary }]}>
-                Gestionar Estado
-              </Text>
-            </Pressable>
-          </Link>
+            <Text style={[styles.btnText, { color: theme.colors.primary }]}>
+              Gestionar Estado
+            </Text>
+          </Pressable>
 
-          <Pressable style={styles.btnDanger}
-              onPress={async () => {
-                  const confirmar = confirm("¿Seguro que quieres eliminar este cliente?");
-                  if (!confirmar) return;
+          {/* ELIMINAR */}
+          <Pressable
+            style={styles.btnDanger}
+            onPress={async () => {
+              const confirmar = confirm("¿Seguro que quieres eliminar este cliente?");
+              if (!confirmar) return;
 
-                  await eliminarCliente(cliente.id);
-                  router.replace("/(tabs)/clientes");
-              }}
-              >
-              <Text style={styles.actionText}>Eliminar Cliente</Text>
-            </Pressable>
+              await eliminarCliente(cliente.id);
+              router.back();
+            }}
+          >
+            <Text style={styles.actionText}>Eliminar Cliente</Text>
+          </Pressable>
         </View>
+
       </ScrollView>
     </View>
   );

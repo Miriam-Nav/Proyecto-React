@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { actualizarCliente } from "../../services/clienteService";
-import theme from "../../theme";
+import { actualizarCliente } from "../../../services/clienteService";
+import theme from "../../../theme";
 
 export default function ClienteModal() {
   const { id, nombre } = useLocalSearchParams();

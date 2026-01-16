@@ -19,7 +19,6 @@ export const obtenerPedidosPorCliente = async (clienteId: number) => {
 
 // Crear cliente
 export const crearCliente = async (nuevo: Cliente): Promise<Cliente> => {
-  await new Promise((resolve) => setTimeout(resolve, 400));
   DATA_MOCK.push(nuevo);
   return nuevo;
 };
