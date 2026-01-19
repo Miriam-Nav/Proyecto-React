@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   Pressable,
   ActivityIndicator,
   ScrollView,
@@ -11,10 +10,11 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import { obtenerClientePorId, actualizarCliente } from "../../../services/clienteService";
 import { ClienteFormValues, ClienteSchema } from "../../../schemas/cliente.schema";
 import theme from "../../../theme";
+import { formStyles } from "../../../styles/form.styles";
+import { commonStyles } from "../../../styles/common.styles";
+import { actualizarCliente, obtenerClientePorId } from "../../../services/clienteService";
 
 export default function EditarCliente() {
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
@@ -69,16 +69,16 @@ export default function EditarCliente() {
 
   if (cargando) {
     return (
-      <View style={styles.center}>
+      <View style={commonStyles.center}>
         <ActivityIndicator size="large" color={theme.colors.secondary} />
       </View>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.screen}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Editar Cliente</Text>
+    <ScrollView contentContainerStyle={[commonStyles.screen, {padding: 10}]}>
+      <View style={formStyles.container}>
+        <Text style={[commonStyles.sectionTitle, {textAlign: "center",}]}>Editar Cliente</Text>
 
         {/* -------- NOMBRE -------- */}
         <Controller
@@ -87,7 +87,7 @@ export default function EditarCliente() {
           render={({ field }) => (
             <TextInput
               style={[
-                styles.input,
+                formStyles.input,
                 errors.nombre ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Nombre"
@@ -98,7 +98,7 @@ export default function EditarCliente() {
           )}
         />
         {errors.nombre && (
-          <Text style={styles.error}>{errors.nombre.message}</Text>
+          <Text style={formStyles.error}>{errors.nombre.message}</Text>
         )}
 
         {/* -------- EMAIL -------- */}
@@ -108,7 +108,7 @@ export default function EditarCliente() {
           render={({ field }) => (
             <TextInput
               style={[
-                styles.input,
+                formStyles.input,
                 errors.email ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Email"
@@ -121,7 +121,7 @@ export default function EditarCliente() {
           )}
         />
         {errors.email && (
-          <Text style={styles.error}>{errors.email.message}</Text>
+          <Text style={formStyles.error}>{errors.email.message}</Text>
         )}
 
         {/* -------- TELÉFONO -------- */}
@@ -131,7 +131,7 @@ export default function EditarCliente() {
           render={({ field }) => (
             <TextInput
               style={[
-                styles.input,
+                formStyles.input,
                 errors.telefono ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Teléfono"
@@ -143,17 +143,17 @@ export default function EditarCliente() {
           )}
         />
         {errors.telefono && (
-          <Text style={styles.error}>{errors.telefono.message}</Text>
+          <Text style={formStyles.error}>{errors.telefono.message}</Text>
         )}
 
         {/* -------- BOTONES -------- */}
-        <View style={styles.buttons}>
-          <Pressable style={styles.btnPrimary} onPress={handleSubmit(onSubmit)}>
-            <Text style={styles.btnText}>Guardar Cambios</Text>
+        <View style={formStyles.buttons}>
+          <Pressable style={formStyles.btnPrimary} onPress={handleSubmit(onSubmit)}>
+            <Text style={formStyles.btnText}>Guardar Cambios</Text>
           </Pressable>
 
-          <Pressable style={styles.btnSecondary} onPress={() => router.back()}>
-            <Text style={[styles.btnText, { color: theme.colors.primary }]}>
+          <Pressable style={formStyles.btnSecondary} onPress={() => router.back()}>
+            <Text style={[formStyles.btnText, { color: theme.colors.primary }]}>
               Cancelar
             </Text>
           </Pressable>
@@ -162,83 +162,3 @@ export default function EditarCliente() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flexGrow: 1,
-    backgroundColor: theme.colors.background,
-    padding: 10,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: theme.colors.background,
-  },
-  container: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    padding: 20,
-    borderWidth: 3,
-    borderColor: theme.colors.outline,
-    margin: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 20,
-    fontFamily: "monospace",
-    color: theme.colors.text,
-    textAlign: "center",
-  },
-  input: {
-    backgroundColor: theme.colors.surface,
-    borderWidth: 3,
-    borderColor: theme.colors.outline,
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 15,
-    fontFamily: "monospace",
-    color: theme.colors.text,
-    fontSize: 16,
-  },
-  error: {
-    color: theme.colors.error,
-    fontFamily: "monospace",
-    marginBottom: 10,
-  },
-  buttons: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    marginTop: 20,
-  },
-  btnPrimary: {
-    flex: 1,
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 18,
-    borderRadius: 12,
-    marginHorizontal: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: theme.colors.primary,
-  },
-  btnSecondary: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-    paddingVertical: 18,
-    borderRadius: 12,
-    marginHorizontal: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: theme.colors.primary,
-  },
-  btnText: {
-    color: theme.colors.onPrimary,
-    fontWeight: "bold",
-    fontFamily: "monospace",
-    fontSize: 16,
-  },
-});

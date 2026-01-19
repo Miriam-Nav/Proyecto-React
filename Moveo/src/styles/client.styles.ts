@@ -1,0 +1,77 @@
+import { StyleSheet } from "react-native";
+import theme from "../theme";
+
+export const clientStyles = StyleSheet.create({
+  
+  buscador: {
+    backgroundColor: theme.colors.backgroundCard,
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 15,
+    color: theme.colors.text,
+    fontFamily: "monospace",
+    letterSpacing: 1,
+  },
+  card: {
+    flexDirection: "row",
+    backgroundColor: theme.colors.surface,
+    padding: 15,
+    marginBottom: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: theme.colors.outline,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 15,
+  },
+  avatarText: { 
+    color: theme.colors.onPrimary,
+    fontWeight: "bold", 
+    fontSize: 18,
+    fontFamily: "monospace",
+    letterSpacing: 1,
+  },
+  name: { 
+    fontSize: 16, 
+    fontWeight: "bold", 
+    color: theme.colors.primary,
+    fontFamily: "monospace",
+    letterSpacing: 1,
+  },
+  datos: { 
+    color: theme.colors.inputText,
+    fontFamily: "monospace",
+    letterSpacing: 1,
+  },
+  add: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: theme.colors.secondary,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: theme.colors.surface,
+  },
+  addText: {
+    color: theme.colors.surface,
+    fontSize: 32,
+    fontWeight: "bold",
+    marginTop: -4,
+    fontFamily: "monospace",
+    letterSpacing: 1,
+  },
+});

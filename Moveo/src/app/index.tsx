@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable, ScrollView } from "react-native";
+import { View, Pressable, ScrollView } from "react-native";
 import { Text, TextInput, Button, Divider, IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import theme from "../theme";
+import { logginStyles } from "../styles/loggin.styles";
+import { commonStyles } from "../styles/common.styles";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -15,17 +17,15 @@ export default function LoginScreen() {
     router.replace("/(tabs)/home");
   };
 
-  
-
   return (
     <ScrollView 
-      contentContainerStyle={styles.screen}
+      contentContainerStyle={logginStyles.screenLoggin}
       keyboardShouldPersistTaps="handled"
     >
-      <View style={styles.container}>
+      <View style={logginStyles.containerLoggin}>
 
         {/* HEADER */}
-        <View style={styles.header}>
+        <View style={logginStyles.headerLoggin}>
           <IconButton
             icon="lock"
             size={50}
@@ -33,13 +33,13 @@ export default function LoginScreen() {
             containerColor={theme.colors.outline}
             style={{ marginBottom: 10 }}
           />
-          <Text style={styles.title}>BIENVENIDO</Text>
-          <Text style={styles.subtitle}>Introduce tus credenciales para continuar</Text>
+          <Text style={logginStyles.titleLoggin}>BIENVENIDO</Text>
+          <Text style={[commonStyles.headerSubtitle,{textAlign: "center"}]}>Introduce tus credenciales para continuar</Text>
         </View>
 
         {/* EMAIL */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>CORREO ELECTRÓNICO</Text>
+        <View style={{marginBottom: 15}}>
+          <Text style={commonStyles.labelColor}>CORREO ELECTRÓNICO</Text>
           <TextInput
             value={email}
             onChangeText={setEmail}
@@ -47,15 +47,15 @@ export default function LoginScreen() {
             placeholder="nombre@ejemplo.com"
             placeholderTextColor={theme.colors.placeholder}
             left={<TextInput.Icon icon="email-outline" color={theme.colors.placeholder} />}
-            style={styles.input}
-            outlineStyle={styles.inputOutline}
-            contentStyle={styles.inputContent}
+            style={logginStyles.inputLoggin}
+            outlineStyle={logginStyles.inputOutlineLoggin}
+            contentStyle={logginStyles.inputContentLoggin}
           />
         </View>
 
         {/* PASSWORD */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>CONTRASEÑA</Text>
+        <View style={{marginBottom: 15}}>
+          <Text style={commonStyles.labelColor}>CONTRASEÑA</Text>
           <TextInput
             value={password}
             onChangeText={setPassword}
@@ -71,32 +71,32 @@ export default function LoginScreen() {
                 color={theme.colors.placeholder}
               />
             }
-            style={styles.input}
-            outlineStyle={styles.inputOutline}
-            contentStyle={styles.inputContent}
+            style={logginStyles.inputLoggin}
+            outlineStyle={logginStyles.inputOutlineLoggin}
+            contentStyle={logginStyles.inputContentLoggin}
           />
         </View>
 
         {/* RESET PASSWORD */}
         <Pressable>
-          <Text style={styles.resetPassword}>¿Olvidaste tu contraseña?</Text>
+          <Text style={[logginStyles.linkLoggin,{textAlign: "right", marginBottom: 18}]}>¿Olvidaste tu contraseña?</Text>
         </Pressable>
 
         {/* LOGIN BUTTON */}
         <Button 
           mode="contained" 
           onPress={handleLogin} 
-          style={styles.button}
-          labelStyle={styles.buttonLabel}
+          style={logginStyles.buttonLoggin}
+          labelStyle={logginStyles.buttonLabelLoggin}
         >
           INICIAR SESIÓN
         </Button>
 
         {/* DIVIDER */}
-        <View style={styles.row}>
-          <Divider style={styles.divider} />
-          <Text style={styles.or}>O CONTINÚA CON</Text>
-          <Divider style={styles.divider} />
+        <View style={[commonStyles.row, {marginVertical: 15}]}>
+          <Divider style={logginStyles.divider} />
+          <Text style={logginStyles.or}>O CONTINÚA CON</Text>
+          <Divider style={logginStyles.divider} />
         </View>
 
         {/* GOOGLE BUTTON */}
@@ -104,17 +104,17 @@ export default function LoginScreen() {
           icon="google" 
           mode="outlined" 
           onPress={() => {}}
-          style={styles.googleButton}
-          labelStyle={styles.googleButtonLabel}
+          style={logginStyles.googleButton}
+          labelStyle={logginStyles.googleButtonLabel}
         >
           GOOGLE
         </Button>
 
         {/* REGISTER */}
-        <Text style={styles.register}>
+        <Text style={logginStyles.register}>
           ¿No tienes una cuenta?{" "}
           <Pressable>
-            <Text style={styles.link}>Regístrate ahora</Text>
+            <Text style={logginStyles.linkLoggin}>Regístrate ahora</Text>
           </Pressable>
         </Text>
 
@@ -123,133 +123,3 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  screen: {
-    flexGrow: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: theme.colors.background,
-    paddingVertical: 20,
-  },
-  container: {
-    width: "90%",
-    maxWidth: 450,
-    padding: 25,
-    backgroundColor: theme.colors.surface,
-    borderRadius: 15,
-    borderWidth: 3,
-    borderColor: theme.colors.outline,
-  },
-  header: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 6,
-    color: theme.colors.primary,
-    fontFamily: "monospace",
-    letterSpacing: 2,
-  },
-  subtitle: {
-    fontSize: 12,
-    marginBottom: 20,
-    color: theme.colors.inputText,
-    fontFamily: "monospace",
-    letterSpacing: 0.5,
-    textAlign: "center",
-  },
-  
-  /* INPUTS */
-  inputContainer: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: "bold",
-    color: theme.colors.primary,
-    marginBottom: 6,
-    fontFamily: "monospace",
-    letterSpacing: 1,
-  },
-  input: {
-    backgroundColor: theme.colors.backgroundCard,
-    fontFamily: "monospace",
-  },
-  inputOutline: {
-    borderWidth: 3,
-    borderColor: theme.colors.outline,
-    borderRadius: 10,
-  },
-  inputContent: {
-    fontFamily: "monospace",
-    letterSpacing: 0.5,
-    fontSize: 14,
-  },
-  
-  resetPassword: {
-    textAlign: "right",
-    marginBottom: 18,
-    color: theme.colors.secondary,
-    fontWeight: "bold",
-    fontSize: 12,
-    fontFamily: "monospace",
-    letterSpacing: 0.5,
-  },
-  button: {
-    marginBottom: 18,
-    backgroundColor: theme.colors.primary,
-    borderRadius: 10,
-  },
-  buttonLabel: {
-    fontFamily: "monospace",
-    letterSpacing: 2,
-    fontSize: 14,
-    paddingVertical: 3,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 15,
-  },
-  divider: {
-    flex: 1,
-    height: 2,
-    backgroundColor: theme.colors.outline,
-    marginHorizontal: 12,
-  },
-  or: {
-    textAlign: "center",
-    color: theme.colors.placeholder,
-    fontSize: 10,
-    fontFamily: "monospace",
-    letterSpacing: 1,
-  },
-  googleButton: {
-    marginBottom: 18,
-    borderWidth: 3,
-    borderColor: theme.colors.primary,
-    borderRadius: 10,
-  },
-  googleButtonLabel: {
-    color: theme.colors.primary,
-    fontFamily: "monospace",
-    letterSpacing: 1,
-    fontSize: 14,
-  },
-  register: {
-    marginTop: 5,
-    textAlign: "center",
-    color: theme.colors.inputText,
-    fontSize: 12,
-    fontFamily: "monospace",
-    letterSpacing: 0.5,
-  },
-  link: {
-    color: theme.colors.secondary,
-    fontWeight: "bold",
-    fontFamily: "monospace",
-    letterSpacing: 0.5,
-  },
-});

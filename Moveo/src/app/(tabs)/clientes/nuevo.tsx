@@ -2,7 +2,6 @@ import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   Pressable,
   ScrollView,
 } from "react-native";
@@ -12,6 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { crearCliente } from "../../../services/clienteService";
 import { ClienteFormValues, ClienteSchema } from "../../../schemas/cliente.schema";
 import theme from "../../../theme";
+import { formStyles } from "../../../styles/form.styles";
+import { commonStyles } from "../../../styles/common.styles";
 
 export default function NuevoCliente() {
   const router = useRouter();
@@ -48,9 +49,9 @@ export default function NuevoCliente() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.screen}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Nuevo Cliente</Text>
+    <ScrollView contentContainerStyle={[commonStyles.screen, {padding: 10}]}>
+      <View style={[formStyles.container, /*margin: 20 */]}>
+        <Text style={[commonStyles.sectionTitle, {textAlign: "center",}]}>Nuevo Cliente</Text>
 
         {/* -------- NOMBRE -------- */}
         <Controller
@@ -59,7 +60,7 @@ export default function NuevoCliente() {
           render={({ field }) => (
             <TextInput
               style={[ 
-                styles.input,
+                formStyles.input,
                 // Si hay error pone borde rojo
                 errors.nombre ? { borderColor: theme.colors.error } : null,
               ]}
@@ -72,7 +73,7 @@ export default function NuevoCliente() {
         />
         {/* Mensaje de error */}
         {errors.nombre && (
-          <Text style={styles.error}>{errors.nombre.message}</Text>
+          <Text style={formStyles.error}>{errors.nombre.message}</Text>
         )}
 
         {/* -------- EMAIL -------- */}
@@ -82,7 +83,7 @@ export default function NuevoCliente() {
           render={({ field }) => (
             <TextInput
               style={[
-                styles.input,
+                formStyles.input,
                 errors.email ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Email"
@@ -95,7 +96,7 @@ export default function NuevoCliente() {
           )}
         />
         {errors.email && (
-          <Text style={styles.error}>{errors.email.message}</Text>
+          <Text style={formStyles.error}>{errors.email.message}</Text>
         )}
 
         {/* -------- TELÉFONO -------- */}
@@ -105,7 +106,7 @@ export default function NuevoCliente() {
           render={({ field }) => (
             <TextInput
               style={[
-                styles.input,
+                formStyles.input,
                 errors.telefono ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Teléfono"
@@ -117,18 +118,18 @@ export default function NuevoCliente() {
           )}
         />
         {errors.telefono && (
-          <Text style={styles.error}>{errors.telefono.message}</Text>
+          <Text style={formStyles.error}>{errors.telefono.message}</Text>
         )}
 
         {/* -------- BOTONES -------- */}
-        <View style={styles.buttons}>
+        <View style={formStyles.buttons}>
           {/* handleSubmit valida con Zod y luego ejecuta onSubmit */}
-          <Pressable style={styles.btnPrimary} onPress={handleSubmit(onSubmit)}>
-            <Text style={styles.btnText}>Crear Cliente</Text>
+          <Pressable style={formStyles.btnPrimary} onPress={handleSubmit(onSubmit)}>
+            <Text style={formStyles.btnText}>Crear Cliente</Text>
           </Pressable>
 
-          <Pressable style={styles.btnSecondary} onPress={() => router.back()}>
-            <Text style={[styles.btnText, { color: theme.colors.primary }]}>
+          <Pressable style={formStyles.btnSecondary} onPress={() => router.back()}>
+            <Text style={[formStyles.btnText, { color: theme.colors.primary, textAlign:"center" }]}>
               Cancelar
             </Text>
           </Pressable>
@@ -137,85 +138,3 @@ export default function NuevoCliente() {
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flexGrow: 1,
-    backgroundColor: theme.colors.background,
-    padding: 10,
-  },
-
-  container: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    padding: 20,
-    borderWidth: 3,
-    borderColor: theme.colors.outline,
-    margin: 20,
-  },
-
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 20,
-    fontFamily: "monospace",
-    color: theme.colors.text,
-    textAlign: "center",
-  },
-
-  input: {
-    backgroundColor: theme.colors.surface,
-    borderWidth: 3,
-    borderColor: theme.colors.outline,
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 15,
-    fontFamily: "monospace",
-    color: theme.colors.text,
-    fontSize: 16,
-  },
-
-  error: {
-    color: theme.colors.error,
-    fontFamily: "monospace",
-    marginBottom: 10,
-  },
-
-  buttons: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    marginTop: 20,
-  },
-
-  btnPrimary: {
-    flex: 1,
-    backgroundColor: theme.colors.primary,
-    paddingVertical: 18,
-    borderRadius: 12,
-    marginHorizontal: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: theme.colors.primary,
-  },
-
-  btnSecondary: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-    paddingVertical: 18,
-    borderRadius: 12,
-    marginHorizontal: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: theme.colors.primary,
-  },
-
-  btnText: {
-    color: theme.colors.onPrimary,
-    fontWeight: "bold",
-    fontFamily: "monospace",
-    fontSize: 16,
-  },
-});
