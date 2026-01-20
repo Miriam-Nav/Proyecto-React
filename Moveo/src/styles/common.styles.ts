@@ -9,7 +9,6 @@ export const commonStyles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: theme.colors.background,
   },
-
   loadingText: {
     marginTop: 10,
     fontFamily: "monospace",
@@ -39,16 +38,14 @@ export const commonStyles = StyleSheet.create({
     letterSpacing: 2,
     marginBottom: 8,
   },
-
   headerSubtitle: {
     fontSize: 14,
     color: theme.colors.inputText,
     fontFamily: "monospace",
     letterSpacing: 1,
   },
-
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
     color: theme.colors.primary,
     fontFamily: "monospace",

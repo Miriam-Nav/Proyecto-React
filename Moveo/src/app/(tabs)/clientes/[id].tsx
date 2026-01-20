@@ -192,7 +192,7 @@ export default function ClienteDetalle() {
               router.back();
             }}
           >
-            <Text style={formStyles.actionText}>Eliminar Cliente</Text>
+            <Text style={formStyles.btnText}>Eliminar Cliente</Text>
           </Pressable>
         </View>
 

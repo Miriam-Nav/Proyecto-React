@@ -12,14 +12,20 @@ export const formStyles = StyleSheet.create({
   },
   input: {
     backgroundColor: theme.colors.surface,
+    marginBottom: 15,
+    padding: 3,
+  },
+  inputOutline: {
     borderWidth: 3,
     borderColor: theme.colors.outline,
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 15,
-    fontFamily: "monospace",
+    borderRadius: 10,
+  },
+  inputContent: {
     color: theme.colors.text,
-    fontSize: 16,
+    paddingVertical: 4,
+    fontFamily: "monospace",
+    letterSpacing: 0.5,
+    fontSize: 14,
   },
   error: {
     color: theme.colors.error,
@@ -28,7 +34,6 @@ export const formStyles = StyleSheet.create({
   },
   
   /* ACTION BUTTONS */
-  actionText: { color: theme.colors.onPrimary, fontWeight: "bold" },
   buttons: {
     flexDirection: "row",
     alignItems: "center",

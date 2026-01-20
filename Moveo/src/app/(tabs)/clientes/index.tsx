@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
+import { Text, TextInput } from "react-native-paper";
 import {
   View,
-  Text,
   FlatList,
   Pressable,
   ActivityIndicator,
-  TextInput,
 } from "react-native";
 import { Link, useFocusEffect } from "expo-router";
 import { obtenerClientes } from "../../../services/clienteService";
@@ -72,11 +71,15 @@ export default function ClientesScreen() {
         
       <View style={{flex: 1, padding: 10 }}>
         <TextInput
-          style={clientStyles.buscador}
-          placeholder="Buscar cliente..."
-          placeholderTextColor={theme.colors.placeholder}
           value={busqueda}
           onChangeText={setBusqueda}
+          mode="outlined"
+          placeholder="Buscar cliente..."
+          placeholderTextColor={theme.colors.placeholder}
+          style={clientStyles.buscador}
+          outlineStyle={clientStyles.inputOutline}
+          contentStyle={clientStyles.inputContent}
+          
         />
 
         <FlatList
