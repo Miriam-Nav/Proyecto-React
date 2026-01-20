@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
+import { ActivityIndicator, Text, TextInput } from "react-native-paper";
 import {
   View,
-  Text,
-  TextInput,
   Pressable,
-  ActivityIndicator,
   ScrollView,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -76,7 +74,7 @@ export default function EditarCliente() {
   }
 
   return (
-    <ScrollView contentContainerStyle={[commonStyles.screen, {padding: 10}]}>
+    <ScrollView contentContainerStyle={[commonStyles.screen, {padding: 20, justifyContent: "center"}]}>
       <View style={formStyles.container}>
         <Text style={[commonStyles.sectionTitle, {textAlign: "center",}]}>Editar Cliente</Text>
 
@@ -91,9 +89,13 @@ export default function EditarCliente() {
                 errors.nombre ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Nombre"
+              placeholderTextColor={theme.colors.placeholder}
               value={field.value}
               onChangeText={field.onChange}
               onBlur={field.onBlur}
+              outlineStyle={formStyles.inputOutline}
+              contentStyle={formStyles.inputContent}
+              mode="outlined"
             />
           )}
         />
@@ -112,11 +114,15 @@ export default function EditarCliente() {
                 errors.email ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Email"
+              placeholderTextColor={theme.colors.placeholder}
               value={field.value}
               onChangeText={field.onChange}
               onBlur={field.onBlur}
               autoCapitalize="none"
               keyboardType="email-address"
+              outlineStyle={formStyles.inputOutline}
+              contentStyle={formStyles.inputContent}
+              mode="outlined"
             />
           )}
         />
@@ -135,10 +141,14 @@ export default function EditarCliente() {
                 errors.telefono ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Teléfono"
+              placeholderTextColor={theme.colors.placeholder}
               value={field.value}
               onChangeText={field.onChange}
               onBlur={field.onBlur}
               keyboardType="phone-pad"
+              outlineStyle={formStyles.inputOutline}
+              contentStyle={formStyles.inputContent}
+              mode="outlined"
             />
           )}
         />

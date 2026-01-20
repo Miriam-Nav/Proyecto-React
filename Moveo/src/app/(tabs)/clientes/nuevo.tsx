@@ -1,7 +1,6 @@
+import { Text, TextInput } from "react-native-paper";
 import {
   View,
-  Text,
-  TextInput,
   Pressable,
   ScrollView,
 } from "react-native";
@@ -49,7 +48,7 @@ export default function NuevoCliente() {
   };
 
   return (
-    <ScrollView contentContainerStyle={[commonStyles.screen, {padding: 10}]}>
+    <ScrollView contentContainerStyle={[commonStyles.screen, {padding: 20, justifyContent: "center"}]}>
       <View style={[formStyles.container, /*margin: 20 */]}>
         <Text style={[commonStyles.sectionTitle, {textAlign: "center",}]}>Nuevo Cliente</Text>
 
@@ -59,15 +58,20 @@ export default function NuevoCliente() {
           name="nombre"     
           render={({ field }) => (
             <TextInput
+              value={field.value} 
+              onChangeText={field.onChange} 
+              mode="outlined"
+              placeholder="Nombre"
+              placeholderTextColor={theme.colors.placeholder}
               style={[ 
                 formStyles.input,
                 // Si hay error pone borde rojo
                 errors.nombre ? { borderColor: theme.colors.error } : null,
               ]}
-              placeholder="Nombre"
-              value={field.value} 
-              onChangeText={field.onChange} 
+              outlineStyle={formStyles.inputOutline}
+              contentStyle={formStyles.inputContent}
               onBlur={field.onBlur} 
+              
             />
           )}
         />
@@ -87,11 +91,15 @@ export default function NuevoCliente() {
                 errors.email ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Email"
+              placeholderTextColor={theme.colors.placeholder}
               value={field.value}
               onChangeText={field.onChange}
               onBlur={field.onBlur}
               autoCapitalize="none"
               keyboardType="email-address"
+              outlineStyle={formStyles.inputOutline}
+              contentStyle={formStyles.inputContent}
+              mode="outlined"
             />
           )}
         />
@@ -110,10 +118,14 @@ export default function NuevoCliente() {
                 errors.telefono ? { borderColor: theme.colors.error } : null,
               ]}
               placeholder="Teléfono"
+              placeholderTextColor={theme.colors.placeholder}
               value={field.value}
               onChangeText={field.onChange}
               onBlur={field.onBlur}
               keyboardType="phone-pad"
+              outlineStyle={formStyles.inputOutline}
+              contentStyle={formStyles.inputContent}
+              mode="outlined"
             />
           )}
         />

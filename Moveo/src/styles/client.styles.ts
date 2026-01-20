@@ -5,19 +5,26 @@ export const clientStyles = StyleSheet.create({
   
   buscador: {
     backgroundColor: theme.colors.backgroundCard,
-    padding: 12,
-    borderRadius: 8,
     marginBottom: 15,
+  },
+  inputOutline: {
+    borderWidth: 0,
+    borderRadius: 10,
+    borderColor: theme.colors.backgroundCard,
+  },
+  inputContent: {
     color: theme.colors.text,
     fontFamily: "monospace",
-    letterSpacing: 1,
+    letterSpacing: 0.5,
+    fontSize: 14,
   },
   card: {
     flexDirection: "row",
     backgroundColor: theme.colors.surface,
     padding: 15,
     marginBottom: 10,
-    borderRadius: 8,
+    borderTopLeftRadius: 10,
+    borderRadius: 50,
     alignItems: "center",
     borderWidth: 2,
     borderColor: theme.colors.outline,
