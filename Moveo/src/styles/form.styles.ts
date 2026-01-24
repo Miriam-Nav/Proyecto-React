@@ -1,13 +1,12 @@
 import { StyleSheet } from "react-native"; 
-import theme from "../theme";
 
-export const formStyles = StyleSheet.create({
+export const formStyles = (theme) => StyleSheet.create({
   container: {
     backgroundColor: theme.colors.surface,
     borderRadius: 12,
     padding: 20,
     borderWidth: 3,
-    borderColor: theme.colors.outline,
+    borderColor: theme.colors.outlineVariant,
     margin: 20,
   },
   input: {
@@ -17,11 +16,11 @@ export const formStyles = StyleSheet.create({
   },
   inputOutline: {
     borderWidth: 3,
-    borderColor: theme.colors.outline,
+    borderColor: theme.colors.outlineVariant,
     borderRadius: 10,
   },
   inputContent: {
-    color: theme.colors.text,
+    color: theme.colors.onSurface,
     paddingVertical: 4,
     fontFamily: "monospace",
     letterSpacing: 0.5,
@@ -61,17 +60,6 @@ export const formStyles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 3,
     borderColor: theme.colors.primary,
-  },
-  btnDanger: {
-    flex: 1,
-    backgroundColor: theme.colors.error,
-    paddingVertical: 18,
-    borderRadius: 12,
-    marginHorizontal: 6,
-    alignItems: "center",   
-    justifyContent: "center",
-    borderWidth: 3,
-    borderColor: theme.colors.error,
   },
   btnText: {
     color: theme.colors.onPrimary,

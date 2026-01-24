@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native"; 
-import theme from "../theme";
 
-export const idStyles = StyleSheet.create({
+export const idStyles = (theme) => StyleSheet.create({
 
   /* HEADER */
   header: {
@@ -9,7 +8,7 @@ export const idStyles = StyleSheet.create({
     padding: 40,
     backgroundColor: theme.colors.surface,
     borderBottomWidth: 3,
-    borderBottomColor: theme.colors.outline,
+    borderBottomColor: theme.colors.outlineVariant,
   },
   avatar: {
     width: 100,
@@ -20,7 +19,7 @@ export const idStyles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
     borderWidth: 4,
-    borderColor: theme.colors.outline,
+    borderColor: theme.colors.outlineVariant,
   },
   avatarText: {
     fontSize: 48,
@@ -31,7 +30,7 @@ export const idStyles = StyleSheet.create({
   headerName: {
     fontSize: 28,
     fontWeight: "bold",
-    color: theme.colors.text,
+    color: theme.colors.onSurface,
     fontFamily: "monospace",
     marginBottom: 10,
   },
@@ -53,25 +52,25 @@ export const idStyles = StyleSheet.create({
     padding: 20,
     borderRadius: 12,
     borderWidth: 3,
-    borderColor: theme.colors.outline,
+    borderColor: theme.colors.outlineVariant,
     marginBottom: 12,
   },
   infoLabel: {
     fontSize: 12,
     paddingBottom: 5,
-    color: theme.colors.placeholder,
+    color: theme.colors.outline,
     fontFamily: "monospace",
   },
   infoValue: {
     fontSize: 16,
-    color: theme.colors.text,
+    color: theme.colors.onSurface,
     fontFamily: "monospace",
     fontWeight: "600",
   },
 
   /* PEDIDOS */
   emptyPedidosText: {
-    color: theme.colors.placeholder,
+    color: theme.colors.outline,
     fontFamily: "monospace",
   },
   pedidoHeader: {
@@ -83,7 +82,7 @@ export const idStyles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     fontFamily: "monospace",
-    color: theme.colors.text,
+    color: theme.colors.onSurface,
   },
   pedidoEstadoBadge: {
     paddingVertical: 4,
@@ -99,7 +98,7 @@ export const idStyles = StyleSheet.create({
   },
   pedidoFecha: {
     fontSize: 13,
-    color: theme.colors.inputText,
+    color: theme.colors.onSurfaceVariant,
     fontFamily: "monospace",
   },
 });

@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
-import theme from "../theme";
 
-export const commonStyles = StyleSheet.create({
+export const commonStyles = (theme) => StyleSheet.create({
   /* LOADING */
   center: { 
     flex: 1, 
@@ -12,7 +11,7 @@ export const commonStyles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontFamily: "monospace",
-    color: theme.colors.text,
+    color: theme.colors.onSurface,
   },
   
   screen: { 
@@ -40,7 +39,7 @@ export const commonStyles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 14,
-    color: theme.colors.inputText,
+    color: theme.colors.onSurfaceVariant,
     fontFamily: "monospace",
     letterSpacing: 1,
   },

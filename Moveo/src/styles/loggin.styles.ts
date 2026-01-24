@@ -1,7 +1,6 @@
 import { StyleSheet } from "react-native";
-import theme from "../theme";
   
-export const logginStyles = StyleSheet.create({
+export const logginStyles = (theme) => StyleSheet.create({
   screenLoggin: {
     flexGrow: 1,
     justifyContent: "center",
@@ -16,7 +15,7 @@ export const logginStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: 15,
     borderWidth: 3,
-    borderColor: theme.colors.outline,
+    borderColor: theme.colors.outlineVariant,
   },
   headerLoggin: {
     alignItems: "center",
@@ -33,12 +32,12 @@ export const logginStyles = StyleSheet.create({
   
   /* INPUTS */
   inputLoggin: {
-    backgroundColor: theme.colors.backgroundCard,
+    backgroundColor: theme.colors.surfaceVariant,
     fontFamily: "monospace",
   },
   inputOutlineLoggin: {
     borderWidth: 3,
-    borderColor: theme.colors.outline,
+    borderColor: theme.colors.outlineVariant,
     borderRadius: 10,
   },
   inputContentLoggin: {
@@ -61,12 +60,12 @@ export const logginStyles = StyleSheet.create({
   divider: {
     flex: 1,
     height: 2,
-    backgroundColor: theme.colors.outline,
+    backgroundColor: theme.colors.outlineVariant,
     marginHorizontal: 12,
   },
   or: {
     textAlign: "center",
-    color: theme.colors.placeholder,
+    color: theme.colors.outline,
     fontSize: 10,
     fontFamily: "monospace",
     letterSpacing: 1,
@@ -86,7 +85,7 @@ export const logginStyles = StyleSheet.create({
   register: {
     marginTop: 5,
     textAlign: "center",
-    color: theme.colors.inputText,
+    color: theme.colors.onSurfaceVariant,
     fontSize: 12,
     fontFamily: "monospace",
     letterSpacing: 0.5,

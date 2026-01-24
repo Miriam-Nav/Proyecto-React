@@ -1,10 +1,10 @@
 import { Tabs } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
-import theme from "../../theme";
+import { themeApp } from "../../theme";
 
 export default function TabsLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: theme.colors.primary }}>
+    <Tabs screenOptions={{ tabBarActiveTintColor: themeApp.colors.primary }}>
       
       <Tabs.Screen
         name="home"

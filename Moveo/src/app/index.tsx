@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { View, Pressable, ScrollView } from "react-native";
-import { Text, TextInput, Button, Divider, IconButton } from "react-native-paper";
+import { Text, Button, Divider, IconButton, useTheme, TextInput } from "react-native-paper";
 import { useRouter } from "expo-router";
-import theme from "../theme";
 import { logginStyles } from "../styles/loggin.styles";
 import { commonStyles } from "../styles/common.styles";
+import { themeApp } from "../theme";
+import { ControlledEmailInput, ControlledPasswordInput } from "../components/ControlledTextInput";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -13,90 +14,95 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const theme = useTheme();
+  const commonS = commonStyles(theme);
+  const logginS = logginStyles(theme);
+  
   const handleLogin = () => {
     router.replace("/(tabs)/home");
   };
 
   return (
     <ScrollView 
-      contentContainerStyle={logginStyles.screenLoggin}
+      contentContainerStyle={logginS.screenLoggin}
       keyboardShouldPersistTaps="handled"
     >
-      <View style={logginStyles.containerLoggin}>
+      <View style={logginS.containerLoggin}>
 
         {/* HEADER */}
-        <View style={logginStyles.headerLoggin}>
+        <View style={logginS.headerLoggin}>
           <IconButton
             icon="lock"
             size={50}
-            iconColor={theme.colors.primary}
-            containerColor={theme.colors.outline}
+            iconColor={themeApp.colors.primary}
+            containerColor={themeApp.colors.outlineVariant}
             style={{ marginBottom: 10 }}
           />
-          <Text style={logginStyles.titleLoggin}>BIENVENIDO</Text>
-          <Text style={[commonStyles.headerSubtitle,{textAlign: "center"}]}>Introduce tus credenciales para continuar</Text>
+          <Text style={logginS.titleLoggin}>BIENVENIDO</Text>
+          <Text style={[commonS.headerSubtitle,{textAlign: "center"}]}>Introduce tus credenciales para continuar</Text>
         </View>
 
         {/* EMAIL */}
         <View style={{marginBottom: 15}}>
-          <Text style={commonStyles.labelColor}>CORREO ELECTRÓNICO</Text>
+          <Text style={commonS.labelColor}>CORREO ELECTRÓNICO</Text>
           <TextInput
             value={email}
             onChangeText={setEmail}
             mode="outlined"
             placeholder="nombre@ejemplo.com"
-            placeholderTextColor={theme.colors.placeholder}
-            left={<TextInput.Icon icon="email-outline" color={theme.colors.placeholder} />}
-            style={logginStyles.inputLoggin}
-            outlineStyle={logginStyles.inputOutlineLoggin}
-            contentStyle={logginStyles.inputContentLoggin}
+            placeholderTextColor={theme.colors.outline}
+            left={<TextInput.Icon icon="email-outline" color={theme.colors.outline} />}
+            style={logginS.inputLoggin}
+            outlineStyle={logginS.inputOutlineLoggin}
+            contentStyle={logginS.inputContentLoggin}
           />
         </View>
 
         {/* PASSWORD */}
         <View style={{marginBottom: 15}}>
-          <Text style={commonStyles.labelColor}>CONTRASEÑA</Text>
+          <Text style={commonS.labelColor}>CONTRASEÑA</Text>
           <TextInput
             value={password}
             onChangeText={setPassword}
             mode="outlined"
             secureTextEntry={!showPassword}
             placeholder="••••••••"
-            placeholderTextColor={theme.colors.placeholder}
-            left={<TextInput.Icon icon="lock" color={theme.colors.placeholder} />}
+            placeholderTextColor={theme.colors.outline}
+            left={<TextInput.Icon icon="lock" color={theme.colors.outline} />}
             right={
               <TextInput.Icon
                 icon={showPassword ? "eye-off" : "eye"}
                 onPress={() => setShowPassword(!showPassword)}
-                color={theme.colors.placeholder}
+                color={theme.colors.outline}
               />
             }
-            style={logginStyles.inputLoggin}
-            outlineStyle={logginStyles.inputOutlineLoggin}
-            contentStyle={logginStyles.inputContentLoggin}
+            style={logginS.inputLoggin}
+            outlineStyle={logginS.inputOutlineLoggin}
+            contentStyle={logginS.inputContentLoggin}
           />
         </View>
 
+
         {/* RESET PASSWORD */}
         <Pressable>
-          <Text style={[logginStyles.linkLoggin,{textAlign: "right", marginBottom: 18}]}>¿Olvidaste tu contraseña?</Text>
+          <Text style={[logginS.linkLoggin,{textAlign: "right", marginBottom: 18}]}>¿Olvidaste tu contraseña?</Text>
         </Pressable>
 
         {/* LOGIN BUTTON */}
         <Button 
           mode="contained" 
           onPress={handleLogin} 
-          style={logginStyles.buttonLoggin}
-          labelStyle={logginStyles.buttonLabelLoggin}
+          style={logginS.buttonLoggin}
+          labelStyle={logginS.buttonLabelLoggin}
         >
           INICIAR SESIÓN
         </Button>
 
         {/* DIVIDER */}
-        <View style={[commonStyles.row, {marginVertical: 15}]}>
-          <Divider style={logginStyles.divider} />
-          <Text style={logginStyles.or}>O CONTINÚA CON</Text>
-          <Divider style={logginStyles.divider} />
+        <View style={[commonS.row, {marginVertical: 15}]}>
+          <Divider style={logginS.divider} />
+          <Text style={logginS.or}>O CONTINÚA CON</Text>
+          <Divider style={logginS.divider} />
         </View>
 
         {/* GOOGLE BUTTON */}
@@ -104,17 +110,17 @@ export default function LoginScreen() {
           icon="google" 
           mode="outlined" 
           onPress={() => {}}
-          style={logginStyles.googleButton}
-          labelStyle={logginStyles.googleButtonLabel}
+          style={logginS.googleButton}
+          labelStyle={logginS.googleButtonLabel}
         >
           GOOGLE
         </Button>
 
         {/* REGISTER */}
-        <Text style={logginStyles.register}>
+        <Text style={logginS.register}>
           ¿No tienes una cuenta?{" "}
           <Pressable>
-            <Text style={logginStyles.linkLoggin}>Regístrate ahora</Text>
+            <Text style={logginS.linkLoggin}>Regístrate ahora</Text>
           </Pressable>
         </Text>
 

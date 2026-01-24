@@ -3,7 +3,6 @@ import {
   View,
   Text,
   ActivityIndicator,
-  Pressable,
   ScrollView,
 } from "react-native";
 import {
@@ -12,18 +11,22 @@ import {
   useFocusEffect,
   router,
 } from "expo-router";
-import {
-  eliminarCliente,
-  obtenerClientePorId,
-  obtenerPedidosPorCliente,
-} from "../../../services/clienteService";
-import { Cliente, Pedido } from "../../../types/mockApi";
-import theme from "../../../theme";
-import { idStyles } from "../../../styles/id.styles";
+import { useTheme } from "react-native-paper";
+import { PrimaryButton, SecondaryButton } from "../../../components/ButtonApp";
+import { InfoCard, InfoCardPedidos } from "../../../components/CardApp";
+import { obtenerClientePorId, obtenerPedidosPorCliente, eliminarCliente } from "../../../services/clienteService";
 import { commonStyles } from "../../../styles/common.styles";
 import { formStyles } from "../../../styles/form.styles";
+import { idStyles } from "../../../styles/id.styles";
+import { themeApp } from "../../../theme";
+import { Cliente, Pedido } from "../../../types/mockApi";
 
 export default function ClienteDetalle() {
+  const theme = useTheme();
+  const commonS = commonStyles(theme);
+  const idS = idStyles(theme);
+  const formS = formStyles(theme);
+
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
   const [cliente, setCliente] = useState<Cliente | null>(null);
   const [cargando, setCargando] = useState(true);
@@ -51,16 +54,16 @@ export default function ClienteDetalle() {
 
   if (cargando) {
     return (
-      <View style={commonStyles.center}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={commonStyles.loadingText}>Cargando cliente...</Text>
+      <View style={commonS.center}>
+        <ActivityIndicator size="large" color={themeApp.colors.primary} />
+        <Text style={commonS.loadingText}>Cargando cliente...</Text>
       </View>
     );
   }
 
   if (!cliente) {
     return (
-      <View style={commonStyles.center}>
+      <View style={commonS.center}>
         <Text>Cliente no encontrado</Text>
       </View>
     );
@@ -71,34 +74,34 @@ export default function ClienteDetalle() {
       <Stack.Screen
         options={{
           title: cliente.nombre,
-          headerStyle: { backgroundColor: theme.colors.surface },
-          headerTintColor: theme.colors.primary,
+          headerStyle: { backgroundColor: themeApp.colors.surface },
+          headerTintColor: themeApp.colors.primary,
         }}
       />
 
-      <ScrollView style={commonStyles.screen} contentContainerStyle={{ paddingBottom: 40 }}>
+      <ScrollView style={commonS.screen} contentContainerStyle={{ paddingBottom: 40 }}>
         
         {/* Header */}
-        <View style={idStyles.header}>
-          <View style={idStyles.avatar}>
-            <Text style={idStyles.avatarText}>
+        <View style={idS.header}>
+          <View style={idS.avatar}>
+            <Text style={idS.avatarText}>
               {cliente.nombre.charAt(0).toUpperCase()}
             </Text>
           </View>
 
-          <Text style={idStyles.headerName}>{cliente.nombre}</Text>
+          <Text style={idS.headerName}>{cliente.nombre}</Text>
 
           <View
             style={[
-              idStyles.statusBadge,
+              idS.statusBadge,
               {
                 backgroundColor: cliente.activo
-                  ? theme.colors.success
-                  : theme.colors.error,
+                  ? themeApp.colors.success
+                  : themeApp.colors.error,
               },
             ]}
           >
-            <Text style={idStyles.statusBadgeText}>
+            <Text style={idS.statusBadgeText}>
               {cliente.activo ? "ACTIVO" : "INACTIVO"}
             </Text>
           </View>
@@ -106,96 +109,65 @@ export default function ClienteDetalle() {
 
         {/* INFO */}
         <View style={{padding: 20 }}>
-          <Text style={commonStyles.sectionTitle}>INFORMACIÓN DE CONTACTO</Text>
-
-          <View style={idStyles.infoCard}>
-            <Text style={idStyles.infoLabel}>Email</Text>
-            <Text style={idStyles.infoValue}>
-              {cliente.email ?? "No registrado"}
-            </Text>
-          </View>
-
-          <View style={idStyles.infoCard}>
-            <Text style={idStyles.infoLabel}>Teléfono</Text>
-            <Text style={idStyles.infoValue}>
-              {cliente.telefono ?? "No registrado"}
-            </Text>
-          </View>
+          <Text style={commonS.sectionTitle}>INFORMACIÓN DE CONTACTO</Text>
+          <InfoCard label="Email" value={cliente.email} />
+          <InfoCard label="Teléfono" value={cliente.telefono} />
         </View>
 
         {/* PEDIDOS */}
         <View style={{padding: 20}}>
-          <Text style={commonStyles.sectionTitle}>ÚLTIMOS PEDIDOS</Text>
+          <Text style={commonS.sectionTitle}>ÚLTIMOS PEDIDOS</Text>
 
           {pedidosCliente.length === 0 ? (
-            <View style={[idStyles.infoCard, {alignItems: "center"}]}>
-              <Text style={idStyles.emptyPedidosText}>
+            <View style={[idS.infoCard, {alignItems: "center"}]}>
+              <Text style={idS.emptyPedidosText}>
                 Este cliente no tiene pedidos.
               </Text>
             </View>
           ) : (
             pedidosCliente.map((pedido) => (
-              <View key={pedido.id} style={idStyles.infoCard}>
-                <View style={idStyles.pedidoHeader}>
-                  <Text style={idStyles.pedidoCodigo}>{pedido.codigo}</Text>
-
-                  <View style={idStyles.pedidoEstadoBadge}>
-                    <Text style={idStyles.pedidoEstadoText}>{pedido.estado}</Text>
-                  </View>
-                </View>
-
-                <Text style={idStyles.pedidoFecha}>{pedido.fechaInicio} - {pedido.fechaFin} </Text>
-              </View>
+              <InfoCardPedidos
+                codigo={pedido.codigo}
+                estado={pedido.estado}
+                fechaInicio={pedido.fechaInicio}
+                fechaFin={pedido.fechaFin}
+              />
             ))
           )}
         </View>
 
         {/* BOTONES */}
-        <View style={formStyles.buttons}>
+        <View style={formS.buttons}>
 
           {/* EDITAR */}
-          <Pressable
-            style={formStyles.btnPrimary}
-            onPress={() => {
+          <PrimaryButton onPress={() => {
               router.push({
                 pathname: "/clientes/editar",
                 params: { id: cliente.id }
               });
-            }}
-          >
-            <Text style={formStyles.btnText}>Editar Cliente</Text>
-          </Pressable>
+            }} text="Editar Cliente" 
+          />
 
           {/* GESTIONAR ESTADO */}
-          <Pressable
-            style={formStyles.btnSecondary}
-            onPress={() => {
+          <SecondaryButton onPress={() => {
               router.push({
                 pathname: "/clientes/modal",
                 params: { id: cliente.id, nombre: cliente.nombre }
               });
-            }}
-          >
-            <Text style={[formStyles.btnText, { color: theme.colors.primary }]}>
-              Gestionar Estado
-            </Text>
-          </Pressable>
+            }} text="Gestionar Estado" 
+          />
 
           {/* ELIMINAR */}
-          <Pressable
-            style={formStyles.btnDanger}
-            onPress={async () => {
+          <PrimaryButton onPress={async () => {
               const confirmar = confirm("¿Seguro que quieres eliminar este cliente?");
               if (!confirmar) return;
-
               await eliminarCliente(cliente.id);
               router.back();
-            }}
-          >
-            <Text style={formStyles.btnText}>Eliminar Cliente</Text>
-          </Pressable>
+            }} 
+            text="Eliminar Cliente"
+            color={themeApp.colors.error}
+          />
         </View>
-
       </ScrollView>
     </View>
   );

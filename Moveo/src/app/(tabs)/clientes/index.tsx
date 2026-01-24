@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Text, TextInput } from "react-native-paper";
+import { Text, TextInput, useTheme } from "react-native-paper";
 import {
   View,
   FlatList,
@@ -8,15 +8,21 @@ import {
 } from "react-native";
 import { Link, useFocusEffect } from "expo-router";
 import { obtenerClientes } from "../../../services/clienteService";
-import { Cliente } from "../../../types/mockApi";
-import theme from "../../../theme";
 import { clientStyles } from "../../../styles/client.styles";
 import { commonStyles } from "../../../styles/common.styles";
+import { themeApp } from "../../../theme";
+import { Cliente } from "../../../types/mockApi";
+
 
 export default function ClientesScreen() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [cargando, setCargando] = useState(true);
   const [busqueda, setBusqueda] = useState("");
+
+  const theme = useTheme();
+  const commonS = commonStyles(theme);
+  const clientS = clientStyles(theme);
+
 
   useEffect(() => {
     cargarDatos();
@@ -51,8 +57,8 @@ export default function ClientesScreen() {
 
   if (cargando) {
     return (
-      <View style={commonStyles.center}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
+      <View style={commonS.center}>
+        <ActivityIndicator size="large" color={themeApp.colors.primary} />
         <Text>
           Cargando clientes...
         </Text>
@@ -61,10 +67,10 @@ export default function ClientesScreen() {
   }
 
   return (
-    <View style={commonStyles.screen}>
-      <View style={commonStyles.header}>
-        <Text style={commonStyles.headerTitle}>LISTA DE CLIENTES</Text>
-        <Text style={commonStyles.headerSubtitle}>
+    <View style={commonS.screen}>
+      <View style={commonS.header}>
+        <Text style={commonS.headerTitle}>LISTA DE CLIENTES</Text>
+        <Text style={commonS.headerSubtitle}>
           {clientesFiltrados.length} cliente{clientesFiltrados.length !== 1 ? "s" : ""} registrado{clientesFiltrados.length !== 1 ? "s" : ""}
         </Text>
       </View>
@@ -75,11 +81,10 @@ export default function ClientesScreen() {
           onChangeText={setBusqueda}
           mode="outlined"
           placeholder="Buscar cliente..."
-          placeholderTextColor={theme.colors.placeholder}
-          style={clientStyles.buscador}
-          outlineStyle={clientStyles.inputOutline}
-          contentStyle={clientStyles.inputContent}
-          
+          placeholderTextColor={themeApp.colors.outline}
+          style={clientS.buscador}
+          outlineStyle={clientS.inputOutline}
+          contentStyle={clientS.inputContent}
         />
 
         <FlatList
@@ -87,26 +92,26 @@ export default function ClientesScreen() {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <Link href={`/clientes/${item.id}`} asChild>
-              <Pressable style={clientStyles.card}>
+              <Pressable style={clientS.card}>
                 <View
                   style={[
-                    clientStyles.avatar,
+                    clientS.avatar,
                     {
                       backgroundColor: item.activo
-                        ? theme.colors.primary
-                        : theme.colors.secondary,
+                        ? themeApp.colors.primary
+                        : themeApp.colors.secondary,
                     },
                   ]}
                 >
-                  <Text style={clientStyles.avatarText}>
+                  <Text style={clientS.avatarText}>
                     {item.nombre.charAt(0)}
                   </Text>
                 </View>
 
                 <View>
-                  <Text style={clientStyles.name}>{item.nombre}</Text>
-                  <Text style={clientStyles.datos}>{item.email ?? "Sin email"}</Text>
-                  <Text style={clientStyles.datos}>{item.telefono ?? "Sin teléfono"}</Text>
+                  <Text style={clientS.name}>{item.nombre}</Text>
+                  <Text style={clientS.datos}>{item.email ?? "Sin email"}</Text>
+                  <Text style={clientS.datos}>{item.telefono ?? "Sin teléfono"}</Text>
                 </View>
               </Pressable>
             </Link>
@@ -114,8 +119,8 @@ export default function ClientesScreen() {
         />
 
         <Link href="/clientes/nuevo" asChild>
-          <Pressable style={clientStyles.add}>
-            <Text style={clientStyles.addText}>+</Text>
+          <Pressable style={clientS.add}>
+            <Text style={clientS.addText}>+</Text>
           </Pressable>
         </Link>
       </View>

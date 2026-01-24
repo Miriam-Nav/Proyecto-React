@@ -1,20 +1,21 @@
-import { Text, TextInput } from "react-native-paper";
-import {
-  View,
-  Pressable,
-  ScrollView,
-} from "react-native";
+import { Text, useTheme } from "react-native-paper";
+import { View, ScrollView} from "react-native";
 import { useRouter } from "expo-router";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { crearCliente } from "../../../services/clienteService";
+import { PrimaryButton, SecondaryButton } from "../../../components/ButtonApp";
+import { ControlledTextInput } from "../../../components/ControlledTextInput";
 import { ClienteFormValues, ClienteSchema } from "../../../schemas/cliente.schema";
-import theme from "../../../theme";
-import { formStyles } from "../../../styles/form.styles";
+import { crearCliente } from "../../../services/clienteService";
 import { commonStyles } from "../../../styles/common.styles";
+import { formStyles } from "../../../styles/form.styles";
+
 
 export default function NuevoCliente() {
   const router = useRouter();
+  const theme = useTheme();
+  const commonS = commonStyles(theme);
+  const formS = formStyles(theme);
 
   const {
     control,
@@ -48,103 +49,40 @@ export default function NuevoCliente() {
   };
 
   return (
-    <ScrollView contentContainerStyle={[commonStyles.screen, {padding: 20, justifyContent: "center"}]}>
-      <View style={[formStyles.container, /*margin: 20 */]}>
-        <Text style={[commonStyles.sectionTitle, {textAlign: "center",}]}>Nuevo Cliente</Text>
+    <ScrollView contentContainerStyle={[commonS.screen, {padding: 20, justifyContent: "center"}]}>
+      <View style={[formS.container, /*margin: 20 */]}>
+        <Text style={[commonS.sectionTitle, {textAlign: "center",}]}>Nuevo Cliente</Text>
 
         {/* -------- NOMBRE -------- */}
-        <Controller
-          control={control} 
-          name="nombre"     
-          render={({ field }) => (
-            <TextInput
-              value={field.value} 
-              onChangeText={field.onChange} 
-              mode="outlined"
-              placeholder="Nombre"
-              placeholderTextColor={theme.colors.placeholder}
-              style={[ 
-                formStyles.input,
-                // Si hay error pone borde rojo
-                errors.nombre ? { borderColor: theme.colors.error } : null,
-              ]}
-              outlineStyle={formStyles.inputOutline}
-              contentStyle={formStyles.inputContent}
-              onBlur={field.onBlur} 
-              
-            />
-          )}
+        <ControlledTextInput
+          control={control}
+          name="nombre"
+          placeholder="Nombre"
+          errors={errors}
         />
-        {/* Mensaje de error */}
-        {errors.nombre && (
-          <Text style={formStyles.error}>{errors.nombre.message}</Text>
-        )}
 
         {/* -------- EMAIL -------- */}
-        <Controller
+        <ControlledTextInput
           control={control}
           name="email"
-          render={({ field }) => (
-            <TextInput
-              style={[
-                formStyles.input,
-                errors.email ? { borderColor: theme.colors.error } : null,
-              ]}
-              placeholder="Email"
-              placeholderTextColor={theme.colors.placeholder}
-              value={field.value}
-              onChangeText={field.onChange}
-              onBlur={field.onBlur}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              outlineStyle={formStyles.inputOutline}
-              contentStyle={formStyles.inputContent}
-              mode="outlined"
-            />
-          )}
+          placeholder="Email"
+          errors={errors}
         />
-        {errors.email && (
-          <Text style={formStyles.error}>{errors.email.message}</Text>
-        )}
 
         {/* -------- TELÉFONO -------- */}
-        <Controller
+        <ControlledTextInput
           control={control}
           name="telefono"
-          render={({ field }) => (
-            <TextInput
-              style={[
-                formStyles.input,
-                errors.telefono ? { borderColor: theme.colors.error } : null,
-              ]}
-              placeholder="Teléfono"
-              placeholderTextColor={theme.colors.placeholder}
-              value={field.value}
-              onChangeText={field.onChange}
-              onBlur={field.onBlur}
-              keyboardType="phone-pad"
-              outlineStyle={formStyles.inputOutline}
-              contentStyle={formStyles.inputContent}
-              mode="outlined"
-            />
-          )}
+          placeholder="Teléfono"
+          errors={errors}
         />
-        {errors.telefono && (
-          <Text style={formStyles.error}>{errors.telefono.message}</Text>
-        )}
 
         {/* -------- BOTONES -------- */}
-        <View style={formStyles.buttons}>
+        <View style={formS.buttons}>
           {/* handleSubmit valida con Zod y luego ejecuta onSubmit */}
-          <Pressable style={formStyles.btnPrimary} onPress={handleSubmit(onSubmit)}>
-            <Text style={formStyles.btnText}>Crear Cliente</Text>
-          </Pressable>
-
-          <Pressable style={formStyles.btnSecondary} onPress={() => router.back()}>
-            <Text style={[formStyles.btnText, { color: theme.colors.primary, textAlign:"center" }]}>
-              Cancelar
-            </Text>
-          </Pressable>
+          <PrimaryButton onPress={handleSubmit(onSubmit)} text="Crear Cliente" />
+          
+          <SecondaryButton onPress={() => router.back()} text="Cancelar" />
         </View>
       </View>
     </ScrollView>

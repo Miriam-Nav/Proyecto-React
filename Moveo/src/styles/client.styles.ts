@@ -1,19 +1,18 @@
 import { StyleSheet } from "react-native";
-import theme from "../theme";
 
-export const clientStyles = StyleSheet.create({
+export const clientStyles = (theme) => StyleSheet.create({
   
   buscador: {
-    backgroundColor: theme.colors.backgroundCard,
+    backgroundColor: theme.colors.surfaceVariant,
     marginBottom: 15,
   },
   inputOutline: {
     borderWidth: 0,
     borderRadius: 10,
-    borderColor: theme.colors.backgroundCard,
+    borderColor: theme.colors.surfaceVariant,
   },
   inputContent: {
-    color: theme.colors.text,
+    color: theme.colors.onSurface,
     fontFamily: "monospace",
     letterSpacing: 0.5,
     fontSize: 14,
@@ -27,7 +26,7 @@ export const clientStyles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     borderWidth: 2,
-    borderColor: theme.colors.outline,
+    borderColor: theme.colors.outlineVariant,
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -56,7 +55,7 @@ export const clientStyles = StyleSheet.create({
     letterSpacing: 1,
   },
   datos: { 
-    color: theme.colors.inputText,
+    color: theme.colors.onSurfaceVariant,
     fontFamily: "monospace",
     letterSpacing: 1,
   },

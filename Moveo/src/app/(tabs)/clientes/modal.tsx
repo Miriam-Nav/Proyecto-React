@@ -1,54 +1,63 @@
 import { View, Text, Pressable } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { useTheme } from "react-native-paper";
+import { PrimaryButton, SecondaryButton } from "../../../components/ButtonApp";
 import { actualizarCliente } from "../../../services/clienteService";
-import { modalStyles } from "../../../styles/modal.styles";
 import { commonStyles } from "../../../styles/common.styles";
+import { idStyles } from "../../../styles/id.styles";
+import { modalStyles } from "../../../styles/modal.styles";
+import { themeApp } from "../../../theme";
 
 export default function ClienteModal() {
   const { id, nombre } = useLocalSearchParams();
   const router = useRouter();
+  const theme = useTheme();
+  const commonS = commonStyles(theme);
+  const modalS = modalStyles(theme);
+  const idS = idStyles(theme);
 
   const handleUpdate = async (activo: boolean) => {
     await actualizarCliente(Number(id), { activo });
     router.back();
   };
 
-  return (
-    <View style={[commonStyles.screen, {justifyContent: "center", padding: 20}]}>
-      <View style={modalStyles.containerModal}>
+  const inicial = typeof nombre === "string" ? nombre.charAt(0).toUpperCase() : "?";
 
-        {/* TÍTULO */}
-        <Text style={[commonStyles.sectionTitle, {textAlign: "center"}]}>GESTIONAR CLIENTE</Text>
-        <Text style={modalStyles.nameUser}>{nombre}</Text>
+  return (
+    <View style={[commonS.screen, { justifyContent: "center", padding: 20 }]}>
+      <View style={modalS.containerModal}>
+
+        {/* ICONO CIRCULAR CON INICIAL */}
+        <View style={idS.avatar}>
+          <Text style={idS.avatarText}>{inicial}</Text>
+        </View>
+
+        {/* NOMBRE DEL CLIENTE */}
+        <Text style={modalS.nameUser}>{nombre}</Text>
 
         {/* DESCRIPCIÓN */}
-        <Text style={modalStyles.description}>
+        <Text style={modalS.description}>
           Selecciona el nuevo estado para este cliente
         </Text>
 
-        {/* BOTÓN ACTIVO */}
-        <Pressable
-          style={[modalStyles.button, modalStyles.buttonSuccess]}
-          onPress={() => handleUpdate(true)}
-        >
-          <View style={commonStyles.row}>
-            <Text style={modalStyles.buttonText}>MARCAR COMO ACTIVO</Text>
-          </View>
-        </Pressable>
+        <View style={{ width: "100%", gap: 12 }}>
+          <PrimaryButton 
+            onPress={() => handleUpdate(true)} 
+            text="MARCAR COMO ACTIVO" 
+            color={themeApp.colors.success}
+          />
 
-        {/* BOTÓN INACTIVO */}
-        <Pressable
-          style={[modalStyles.button, modalStyles.buttonError]}
-          onPress={() => handleUpdate(false)}
-        >
-          <View style={commonStyles.row}>
-            <Text style={modalStyles.buttonText}>MARCAR COMO INACTIVO</Text>
-          </View>
-        </Pressable>
+          <SecondaryButton 
+            onPress={() => handleUpdate(false)} 
+            text="MARCAR COMO INACTIVO" 
+            color={themeApp.colors.error}
+          />
+        </View>
+
 
         {/* CANCELAR */}
         <Pressable onPress={() => router.back()}>
-          <Text style={[commonStyles.labelColor, {marginTop: 16}]}>Cancelar</Text>
+          <Text style={[commonS.labelColor, { marginTop: 30 }]}>Cancelar</Text>
         </Pressable>
 
       </View>
