@@ -16,9 +16,7 @@ export type UpdateUserPayload = {
   email: string;
 };
 
-// Recibe usuario y devuelve:
-// - el usuario
-// - su rol correspondiente (buscado en roles[])
+// Recibe usuario y devuelve el usuario y su rol 
 const mapProfile = (user: User) => {
   // Busca el rol que su id coincide con el roleId del usuario.
   const role = roles.find((rol) => rol.id === user.roleId);
@@ -32,31 +30,26 @@ const mapProfile = (user: User) => {
   return { user, role };
 };
 
-// -------------------------------------------------------------
-// login
-// -------------------------------------------------------------
-// Simula un login realista, igual que el del profesor pero sin Supabase.
+// LOGIN
 export const login = async (email: string, password: string): Promise<AuthSession> => {
-  // Simulamos un retardo de red (400 ms).
-  await new Promise((r) => setTimeout(r, 400));
 
-  // Buscamos un usuario cuyo email coincida (ignorando mayúsculas/minúsculas).
+  // Busca un usuario que email coincida
   const user = usuarios.find(
     (u) => u.email.toLowerCase() === email.trim().toLowerCase()
   );
 
-  // Si no existe o la contraseña no es "123456", error.
+  // Si no existe o la contraseña no es "123456" da error.
   if (!user || password !== "123456") {
     throw new Error("Usuario o contraseña incorrectos.");
   }
 
-  // Obtenemos el rol del usuario usando mapProfile.
+  // Obtiene el rol del usuario
   const { role } = mapProfile(user);
 
-  // Generamos un token falso (como haría Supabase).
+  // Genera un token falso 
   const token = `fake-token-${user.id}-${Date.now()}`;
 
-  // Devolvemos la sesión completa.
+  // Devuelve la sesion completa.
   return {
     user,
     role,
@@ -64,68 +57,25 @@ export const login = async (email: string, password: string): Promise<AuthSessio
   };
 };
 
-// -------------------------------------------------------------
-// register
-// -------------------------------------------------------------
-// Simula un registro de usuario, igual que el del profesor.
-export const register = async (email: string, password: string): Promise<AuthSession> => {
-  // Simulamos retardo de red.
-  await new Promise((r) => setTimeout(r, 400));
 
-  // Si ya existe un usuario con ese email, error.
-  if (usuarios.some((u) => u.email === email)) {
-    throw new Error("El usuario ya existe.");
-  }
-
-  // Creamos un nuevo usuario con rol NORMAL (roleId = 1).
-  const newUser: User = {
-    id: usuarios.length + 1,
-    roleId: 1,
-    name: email.split("@")[0], // nombre base sacado del email
-    email,
-  };
-
-  // Lo añadimos al array de usuarios mock.
-  usuarios.push(newUser);
-
-  // Obtenemos su rol.
-  const { role } = mapProfile(newUser);
-
-  // Generamos token falso.
-  const token = `fake-token-${newUser.id}-${Date.now()}`;
-
-  // Devolvemos la sesión completa.
-  return {
-    user: newUser,
-    role,
-    token,
-  };
-};
-
-// -------------------------------------------------------------
-// updateUserProfile
-// -------------------------------------------------------------
-// Simula la actualización del perfil del usuario.
-// Es equivalente al updateUserProfile del profesor.
+// UPDATE
 export const updateUserProfile = async (payload: UpdateUserPayload): Promise<User> => {
-  // Simulamos retardo de red.
-  await new Promise((r) => setTimeout(r, 300));
 
-  // Buscamos el usuario por id.
+  // Busca usuario por id.
   const index = usuarios.findIndex((u) => u.id === payload.id);
 
-  // Si no existe, error.
+  // Si no existe da error.
   if (index === -1) {
     throw new Error("Usuario no encontrado.");
   }
 
-  // Actualizamos los datos del usuario.
+  // Actualiza datos del usuario.
   usuarios[index] = {
     ...usuarios[index],
     name: payload.name.trim(),
     email: payload.email.trim(),
   };
 
-  // Devolvemos el usuario actualizado.
+  // Devuelve el usuario actualizado.
   return usuarios[index];
 };

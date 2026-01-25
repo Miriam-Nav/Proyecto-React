@@ -33,9 +33,7 @@ export function SecondaryButton({ text, onPress, color, borderColor }: Props) {
   const theme = useTheme();
   const formS = formStyles(theme);
 
-  // Tu lógica: Prioridad color prop > Color tema
   const textColor = color ?? theme.colors.primary;
-  // Tu lógica: Prioridad borderColor prop > color prop > Color tema
   const finalBorderColor = borderColor ?? color ?? theme.colors.primary;
 
   return (

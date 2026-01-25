@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import { View, Pressable, ScrollView } from "react-native";
 import { Text, Button, Divider, IconButton, useTheme } from "react-native-paper";
-import { useRouter } from "expo-router";
 import { logginStyles } from "../styles/loggin.styles";
 import { commonStyles } from "../styles/common.styles";
 import { AuthContext } from "../providers/AuthProvider";

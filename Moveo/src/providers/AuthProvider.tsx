@@ -22,15 +22,15 @@ export function AuthProvider({ children }) {
     restoreSession();
   }, []);
 
-  // Redirigir automáticamente según autenticación
+  // Redirige automáticamente si esta autenticado
   useEffect(() => {
     if (loading) return;
 
     if (isAuthenticated) {
-      // Ruta completa según tu estructura de carpetas
+      // Ruta 
       router.replace("/(protected)/(tabs)/home");
     } else {
-      // Si no está autenticado, va al login (que es la raíz "/")
+      // Si no está autenticado va al login
       router.replace("/");
     }
   }, [isAuthenticated, loading]);
@@ -38,35 +38,31 @@ export function AuthProvider({ children }) {
   const { setUser } = useUserStore();
 
   const logIn = async (email: string, pass: string) => {
-    // Definimos la contraseña única para ambos
+    // Contraseña 
     const SHARED_PASS = "123456";
 
-    // Simulamos un pequeño retraso de red
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // 1. Buscamos si el email existe en nuestro array de usuarios de mockApi
+    // Busca el email en el array de usuarios de mockApi
     const foundUser = usuarios.find(u => u.email.toLowerCase() === email.toLowerCase().trim());
 
-    // 2. Validamos credenciales
+    // Validación
     if (foundUser && pass === SHARED_PASS) {
-      // 3. Buscamos el objeto Rol completo para ese usuario
+      // Busca el objeto Rol del usuario
       const foundRole = roles.find(r => r.id === foundUser.roleId);
       const mockToken = `fake-jwt-token-${foundUser.id}`;
 
       if (foundRole) {
-        // Guardamos en Zustand (Store global)
+        // Guarda en Zustand
         setUser(foundUser, foundRole, mockToken);
         
-        // Guardamos el token para persistencia (AsyncStorage)
+        // Guarda el token para persistencia
         await AsyncStorage.setItem("session-token", mockToken);
         
-        // Cambiamos el estado para que la Home se cargue
+        // Cambiamos el estado para que Home se cargue
         setIsAuthenticated(true); 
         
         console.log(`Login exitoso: ${foundUser.name} con rol ${foundRole.name}`);
       }
     } else {
-      // Si el email no existe o la pass no es 123456
       throw new Error("Credenciales inválidas. Intenta con admin@alquilerapp.com o operario1@alquilerapp.com");
     }
   };
