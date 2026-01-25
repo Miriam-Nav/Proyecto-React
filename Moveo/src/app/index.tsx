@@ -16,6 +16,12 @@ export default function LoginScreen() {
 
   // const setUser = useUserStore((state) => state.setUser);
   // const [showPassword, setShowPassword] = useState(false);
+  
+  // USUARIO 
+  //  - admin@alquilerapp.com 
+  //  - operario1@alquilerapp.com
+  //
+  // CONTRASEÑA PARA AMBOS: 123456
 
   const { 
     control, 
