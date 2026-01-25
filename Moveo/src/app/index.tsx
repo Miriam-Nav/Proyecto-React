@@ -1,27 +1,43 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Pressable, ScrollView } from "react-native";
-import { Text, Button, Divider, IconButton, useTheme, TextInput } from "react-native-paper";
+import { Text, Button, Divider, IconButton, useTheme } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { logginStyles } from "../styles/loggin.styles";
 import { commonStyles } from "../styles/common.styles";
-import { themeApp } from "../theme";
+import { AuthContext } from "../providers/AuthProvider";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoginFormValues, loginSchema } from "../schemas/auth.schema";
 import { ControlledEmailInput, ControlledPasswordInput } from "../components/ControlledTextInput";
 
 export default function LoginScreen() {
-  const router = useRouter();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-
   const theme = useTheme();
   const commonS = commonStyles(theme);
   const logginS = logginStyles(theme);
-  
-  const handleLogin = () => {
-    router.replace("/(tabs)/home");
-  };
 
+  // const setUser = useUserStore((state) => state.setUser);
+  // const [showPassword, setShowPassword] = useState(false);
+
+  const { 
+    control, 
+    handleSubmit, 
+    formState: { errors, isSubmitting }, 
+  } = useForm<LoginFormValues>({ 
+    resolver: zodResolver(loginSchema), 
+    mode: "onBlur", 
+    defaultValues: { email: "", password: "" }, 
+  });
+
+  const { logIn } = useContext(AuthContext);
+
+  const onSubmit = async (data: LoginFormValues) => {
+      try {
+          await logIn(data.email, data.password);
+      } catch (error) {
+          console.error("Fallo del login simulado", error);
+      }
+  };
+  
   return (
     <ScrollView 
       contentContainerStyle={logginS.screenLoggin}
@@ -34,8 +50,8 @@ export default function LoginScreen() {
           <IconButton
             icon="lock"
             size={50}
-            iconColor={themeApp.colors.primary}
-            containerColor={themeApp.colors.outlineVariant}
+            iconColor={theme.colors.primary}
+            containerColor={theme.colors.outlineVariant}
             style={{ marginBottom: 10 }}
           />
           <Text style={logginS.titleLoggin}>BIENVENIDO</Text>
@@ -43,43 +59,36 @@ export default function LoginScreen() {
         </View>
 
         {/* EMAIL */}
-        <View style={{marginBottom: 15}}>
+        <View style={{ marginBottom: 15 }}>
           <Text style={commonS.labelColor}>CORREO ELECTRÓNICO</Text>
-          <TextInput
-            value={email}
-            onChangeText={setEmail}
-            mode="outlined"
+
+          <ControlledEmailInput
+            control={control}
+            name="email"
             placeholder="nombre@ejemplo.com"
-            placeholderTextColor={theme.colors.outline}
-            left={<TextInput.Icon icon="email-outline" color={theme.colors.outline} />}
-            style={logginS.inputLoggin}
-            outlineStyle={logginS.inputOutlineLoggin}
-            contentStyle={logginS.inputContentLoggin}
+            errors={errors}
+            leftIcon="email-outline"
           />
+
+          {errors.email && (
+            <Text style={{ color: theme.colors.error }}>{errors.email.message}</Text>
+          )}
         </View>
 
         {/* PASSWORD */}
-        <View style={{marginBottom: 15}}>
+        <View style={{ marginBottom: 15 }}>
           <Text style={commonS.labelColor}>CONTRASEÑA</Text>
-          <TextInput
-            value={password}
-            onChangeText={setPassword}
-            mode="outlined"
-            secureTextEntry={!showPassword}
+
+          <ControlledPasswordInput
+            control={control}
+            name="password"
             placeholder="••••••••"
-            placeholderTextColor={theme.colors.outline}
-            left={<TextInput.Icon icon="lock" color={theme.colors.outline} />}
-            right={
-              <TextInput.Icon
-                icon={showPassword ? "eye-off" : "eye"}
-                onPress={() => setShowPassword(!showPassword)}
-                color={theme.colors.outline}
-              />
-            }
-            style={logginS.inputLoggin}
-            outlineStyle={logginS.inputOutlineLoggin}
-            contentStyle={logginS.inputContentLoggin}
+            errors={errors}
           />
+
+          {errors.password && (
+            <Text style={{ color: theme.colors.error }}>{errors.password.message}</Text>
+          )}
         </View>
 
 
@@ -91,7 +100,7 @@ export default function LoginScreen() {
         {/* LOGIN BUTTON */}
         <Button 
           mode="contained" 
-          onPress={handleLogin} 
+          onPress={handleSubmit(onSubmit)}
           style={logginS.buttonLoggin}
           labelStyle={logginS.buttonLabelLoggin}
         >

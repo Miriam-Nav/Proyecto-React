@@ -12,14 +12,14 @@ import {
   router,
 } from "expo-router";
 import { useTheme } from "react-native-paper";
-import { PrimaryButton, SecondaryButton } from "../../../components/ButtonApp";
-import { InfoCard, InfoCardPedidos } from "../../../components/CardApp";
-import { obtenerClientePorId, obtenerPedidosPorCliente, eliminarCliente } from "../../../services/clienteService";
-import { commonStyles } from "../../../styles/common.styles";
-import { formStyles } from "../../../styles/form.styles";
-import { idStyles } from "../../../styles/id.styles";
-import { themeApp } from "../../../theme";
-import { Cliente, Pedido } from "../../../types/mockApi";
+import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
+import { InfoCard, InfoCardPedidos } from "../../../../components/CardApp";
+import { obtenerClientePorId, obtenerPedidosPorCliente, eliminarCliente } from "../../../../services/clienteService";
+import { commonStyles } from "../../../../styles/common.styles";
+import { formStyles } from "../../../../styles/form.styles";
+import { idStyles } from "../../../../styles/id.styles";
+import { Cliente, Pedido } from "../../../../types/mockApi";
+import { CustomHeader } from "../../../../components/HeaderApp";
 
 export default function ClienteDetalle() {
   const theme = useTheme();
@@ -55,7 +55,7 @@ export default function ClienteDetalle() {
   if (cargando) {
     return (
       <View style={commonS.center}>
-        <ActivityIndicator size="large" color={themeApp.colors.primary} />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text style={commonS.loadingText}>Cargando cliente...</Text>
       </View>
     );
@@ -74,14 +74,15 @@ export default function ClienteDetalle() {
       <Stack.Screen
         options={{
           title: cliente.nombre,
-          headerStyle: { backgroundColor: themeApp.colors.surface },
-          headerTintColor: themeApp.colors.primary,
+          headerStyle: { backgroundColor: theme.colors.surface },
+          headerTintColor: theme.colors.primary,
         }}
       />
 
       <ScrollView style={commonS.screen} contentContainerStyle={{ paddingBottom: 40 }}>
         
-        {/* Header */}
+        {/* HEADER */}
+        <CustomHeader title={cliente.nombre}></CustomHeader>
         <View style={idS.header}>
           <View style={idS.avatar}>
             <Text style={idS.avatarText}>
@@ -96,8 +97,8 @@ export default function ClienteDetalle() {
               idS.statusBadge,
               {
                 backgroundColor: cliente.activo
-                  ? themeApp.colors.success
-                  : themeApp.colors.error,
+                  ? theme.colors.onError
+                  : theme.colors.error,
               },
             ]}
           >
@@ -165,7 +166,7 @@ export default function ClienteDetalle() {
               router.back();
             }} 
             text="Eliminar Cliente"
-            color={themeApp.colors.error}
+            color={theme.colors.error}
           />
         </View>
       </ScrollView>

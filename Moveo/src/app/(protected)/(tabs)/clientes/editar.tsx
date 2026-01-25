@@ -4,13 +4,12 @@ import { View, ScrollView} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ClienteFormValues, ClienteSchema } from "../../../schemas/cliente.schema";
-import { PrimaryButton, SecondaryButton } from "../../../components/ButtonApp";
-import { ControlledTextInput } from "../../../components/ControlledTextInput";
-import { themeApp } from "../../../theme";
-import { actualizarCliente, obtenerClientePorId } from "../../../services/clienteService";
-import { formStyles } from "../../../styles/form.styles";
-import { commonStyles } from "../../../styles/common.styles";
+import { ClienteFormValues, ClienteSchema } from "../../../../schemas/cliente.schema";
+import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
+import { ControlledTextInput } from "../../../../components/ControlledTextInput";
+import { actualizarCliente, obtenerClientePorId } from "../../../../services/clienteService";
+import { formStyles } from "../../../../styles/form.styles";
+import { commonStyles } from "../../../../styles/common.styles";
 
 export default function EditarCliente() {
   const theme = useTheme();
@@ -70,7 +69,7 @@ export default function EditarCliente() {
   if (cargando) {
     return (
       <View style={commonS.center}>
-        <ActivityIndicator size="large" color={themeApp.colors.secondary} />
+        <ActivityIndicator size="large" color={theme.colors.secondary} />
       </View>
     );
   }

@@ -1,12 +1,12 @@
-import { Pressable, Text } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { formStyles } from "../styles/form.styles";
-import { themeApp } from "../theme";
 import { useTheme } from "react-native-paper";
 
 type Props = {
   text: string;
   onPress: () => void;
   color?: string;
+  borderColor?: string;
 };
 
 export function PrimaryButton({ text, onPress, color }: Props) {
@@ -29,34 +29,26 @@ export function PrimaryButton({ text, onPress, color }: Props) {
   );
 }
 
-
-export function SecondaryButton({ text, onPress, color }: Props) {
+export function SecondaryButton({ text, onPress, color, borderColor }: Props) {
   const theme = useTheme();
   const formS = formStyles(theme);
 
-  const finalColor = color ?? themeApp.colors.primary;
+  // Tu lógica: Prioridad color prop > Color tema
+  const textColor = color ?? theme.colors.primary;
+  // Tu lógica: Prioridad borderColor prop > color prop > Color tema
+  const finalBorderColor = borderColor ?? color ?? theme.colors.primary;
 
   return (
     <Pressable
       style={[
-        formS.btnSecondary,
-        { borderColor: finalColor }, 
+        formS.btnSecondary, 
+        { borderColor: finalBorderColor }
       ]}
       onPress={onPress}
     >
-      <Text
-        style={[
-          formS.btnText,
-          { color: finalColor, textAlign: "center" }, 
-        ]}
-      >
+      <Text style={[formS.btnText, { color: textColor, textAlign: "center" }]}>
         {text}
       </Text>
     </Pressable>
   );
 }
-
-
-
-
-

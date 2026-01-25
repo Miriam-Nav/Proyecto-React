@@ -1,6 +1,5 @@
 import { TextInput, useTheme } from "react-native-paper";
 import { Control, Controller, FieldErrors } from "react-hook-form";
-import { themeApp } from "../theme";
 import { formStyles } from "../styles/form.styles";
 import { useState } from "react";
 
@@ -26,10 +25,10 @@ export function ControlledTextInput({ control, name, placeholder, errors }: Prop
           onBlur={field.onBlur}
           mode="outlined"
           placeholder={placeholder}
-          placeholderTextColor={themeApp.colors.outline}
+          placeholderTextColor={theme.colors.outline}
           style={[
             formS.input,
-            errors[name] ? { borderColor: themeApp.colors.error } : null,
+            errors[name] ? { borderColor: theme.colors.error } : null,
           ]}
           outlineStyle={formS.inputOutline}
           contentStyle={formS.inputContent}
@@ -55,11 +54,11 @@ export function ControlledEmailInput({ control, name, placeholder, errors, leftI
           onBlur={field.onBlur}
           mode="outlined"
           placeholder={placeholder}
-          placeholderTextColor={themeApp.colors.outline}
+          placeholderTextColor={theme.colors.outline}
           left={leftIcon ? <TextInput.Icon icon={leftIcon} /> : undefined}
           style={[
             formS.input,
-            errors[name] ? { borderColor: themeApp.colors.error } : null,
+            errors[name] ? { borderColor: theme.colors.error } : null,
           ]}
           outlineStyle={formS.inputOutline}
           contentStyle={formS.inputContent}
@@ -87,7 +86,7 @@ export function ControlledPasswordInput({ control, name, placeholder, errors }: 
           mode="outlined"
           secureTextEntry={!showPassword}
           placeholder={placeholder}
-          placeholderTextColor={themeApp.colors.outline}
+          placeholderTextColor={theme.colors.outline}
           left={<TextInput.Icon icon="lock" />}
           right={
             <TextInput.Icon
@@ -97,7 +96,7 @@ export function ControlledPasswordInput({ control, name, placeholder, errors }: 
           }
           style={[
             formS.input,
-            errors[name] ? { borderColor: themeApp.colors.error } : null,
+            errors[name] ? { borderColor: theme.colors.error } : null,
           ]}
           outlineStyle={formS.inputOutline}
           contentStyle={formS.inputContent}

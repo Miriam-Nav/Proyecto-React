@@ -18,6 +18,11 @@ export const commonStyles = (theme) => StyleSheet.create({
     flex: 1, 
     backgroundColor: theme.colors.background,
   },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
   header: {
     backgroundColor: theme.colors.surface,
     padding: 20,

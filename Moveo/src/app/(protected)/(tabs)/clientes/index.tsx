@@ -7,11 +7,10 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { Link, useFocusEffect } from "expo-router";
-import { obtenerClientes } from "../../../services/clienteService";
-import { clientStyles } from "../../../styles/client.styles";
-import { commonStyles } from "../../../styles/common.styles";
-import { themeApp } from "../../../theme";
-import { Cliente } from "../../../types/mockApi";
+import { obtenerClientes } from "../../../../services/clienteService";
+import { clientStyles } from "../../../../styles/client.styles";
+import { commonStyles } from "../../../../styles/common.styles";
+import { Cliente } from "../../../../types/mockApi";
 
 
 export default function ClientesScreen() {
@@ -55,10 +54,11 @@ export default function ClientesScreen() {
   });
 
 
+  // COMPRUEBA QUE LOS CLIENTES HAN CARGADO
   if (cargando) {
     return (
       <View style={commonS.center}>
-        <ActivityIndicator size="large" color={themeApp.colors.primary} />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
         <Text>
           Cargando clientes...
         </Text>
@@ -76,17 +76,19 @@ export default function ClientesScreen() {
       </View>
         
       <View style={{flex: 1, padding: 10 }}>
+        {/* BARRA DE BUSQUEDA */}
         <TextInput
           value={busqueda}
           onChangeText={setBusqueda}
           mode="outlined"
           placeholder="Buscar cliente..."
-          placeholderTextColor={themeApp.colors.outline}
+          placeholderTextColor={theme.colors.outline}
           style={clientS.buscador}
           outlineStyle={clientS.inputOutline}
           contentStyle={clientS.inputContent}
         />
 
+        {/* CLIENTES */}
         <FlatList
           data={clientesFiltrados}
           keyExtractor={(item) => item.id.toString()}
@@ -98,8 +100,8 @@ export default function ClientesScreen() {
                     clientS.avatar,
                     {
                       backgroundColor: item.activo
-                        ? themeApp.colors.primary
-                        : themeApp.colors.secondary,
+                        ? theme.colors.primary
+                        : theme.colors.secondary,
                     },
                   ]}
                 >
@@ -118,6 +120,7 @@ export default function ClientesScreen() {
           )}
         />
 
+        {/* BOTON CREAR CLIENTE */}
         <Link href="/clientes/nuevo" asChild>
           <Pressable style={clientS.add}>
             <Text style={clientS.addText}>+</Text>

@@ -3,12 +3,12 @@ import { View, ScrollView} from "react-native";
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PrimaryButton, SecondaryButton } from "../../../components/ButtonApp";
-import { ControlledTextInput } from "../../../components/ControlledTextInput";
-import { ClienteFormValues, ClienteSchema } from "../../../schemas/cliente.schema";
-import { crearCliente } from "../../../services/clienteService";
-import { commonStyles } from "../../../styles/common.styles";
-import { formStyles } from "../../../styles/form.styles";
+import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
+import { ControlledTextInput } from "../../../../components/ControlledTextInput";
+import { ClienteFormValues, ClienteSchema } from "../../../../schemas/cliente.schema";
+import { crearCliente } from "../../../../services/clienteService";
+import { commonStyles } from "../../../../styles/common.styles";
+import { formStyles } from "../../../../styles/form.styles";
 
 
 export default function NuevoCliente() {
@@ -24,14 +24,13 @@ export default function NuevoCliente() {
   } = useForm<ClienteFormValues>({
     // Zod valida el formulario
     resolver: zodResolver(ClienteSchema),
-
+    
     // Valores iniciales del formulario
     defaultValues: {
       nombre: "",
       email: "",
       telefono: "",
     },
-
     mode: "onBlur",
   });
 
@@ -50,7 +49,7 @@ export default function NuevoCliente() {
 
   return (
     <ScrollView contentContainerStyle={[commonS.screen, {padding: 20, justifyContent: "center"}]}>
-      <View style={[formS.container, /*margin: 20 */]}>
+      <View style={[formS.container]}>
         <Text style={[commonS.sectionTitle, {textAlign: "center",}]}>Nuevo Cliente</Text>
 
         {/* -------- NOMBRE -------- */}

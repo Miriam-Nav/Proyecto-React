@@ -1,19 +1,21 @@
 import { Stack } from "expo-router";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { ThemeProvider } from "../providers/ThemeProvider";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { ThemeProvider } from "../providers/ThemeProvider"; 
+import { AuthProvider } from "../providers/AuthProvider"; 
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          {/* Pantalla de login */}
-          <Stack.Screen name="index" />
-
-          {/* Tabs principales */}
-          <Stack.Screen name="(tabs)" />
-        </Stack>
-      </ThemeProvider>
+      <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+        <AuthProvider> 
+          <ThemeProvider>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(protected)" />
+            </Stack>
+          </ThemeProvider>
+        </AuthProvider>
+      </SafeAreaView>
     </SafeAreaProvider>
   );
 }

@@ -1,12 +1,11 @@
 import { View, Text, Pressable } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useTheme } from "react-native-paper";
-import { PrimaryButton, SecondaryButton } from "../../../components/ButtonApp";
-import { actualizarCliente } from "../../../services/clienteService";
-import { commonStyles } from "../../../styles/common.styles";
-import { idStyles } from "../../../styles/id.styles";
-import { modalStyles } from "../../../styles/modal.styles";
-import { themeApp } from "../../../theme";
+import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
+import { actualizarCliente } from "../../../../services/clienteService";
+import { commonStyles } from "../../../../styles/common.styles";
+import { idStyles } from "../../../../styles/id.styles";
+import { modalStyles } from "../../../../styles/modal.styles";
 
 export default function ClienteModal() {
   const { id, nombre } = useLocalSearchParams();
@@ -27,7 +26,7 @@ export default function ClienteModal() {
     <View style={[commonS.screen, { justifyContent: "center", padding: 20 }]}>
       <View style={modalS.containerModal}>
 
-        {/* ICONO CIRCULAR CON INICIAL */}
+        {/* ICONO CIRCULAR */}
         <View style={idS.avatar}>
           <Text style={idS.avatarText}>{inicial}</Text>
         </View>
@@ -37,20 +36,20 @@ export default function ClienteModal() {
 
         {/* DESCRIPCIÓN */}
         <Text style={modalS.description}>
-          Selecciona el nuevo estado para este cliente
+          Selecciona el nuevo estado
         </Text>
 
         <View style={{ width: "100%", gap: 12 }}>
           <PrimaryButton 
             onPress={() => handleUpdate(true)} 
             text="MARCAR COMO ACTIVO" 
-            color={themeApp.colors.success}
+            color={theme.colors.onError}
           />
 
           <SecondaryButton 
             onPress={() => handleUpdate(false)} 
             text="MARCAR COMO INACTIVO" 
-            color={themeApp.colors.error}
+            color={theme.colors.error}
           />
         </View>
 
