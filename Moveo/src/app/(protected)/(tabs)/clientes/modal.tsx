@@ -2,10 +2,11 @@ import { View, Text, Pressable } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useTheme } from "react-native-paper";
 import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
-import { actualizarCliente } from "../../../../services/clienteService";
 import { commonStyles } from "../../../../styles/common.styles";
 import { idStyles } from "../../../../styles/id.styles";
 import { modalStyles } from "../../../../styles/modal.styles";
+import { useState } from "react";
+import { useUpdateEstadoCliente } from "../../../../hooks/useClientes";
 
 export default function ClienteModal() {
   const { id, nombre } = useLocalSearchParams();
@@ -15,13 +16,21 @@ export default function ClienteModal() {
   const modalS = modalStyles(theme);
   const idS = idStyles(theme);
 
-  const handleUpdate = async (activo: boolean) => {
-    await actualizarCliente(Number(id), { activo });
-    router.back();
+  const [cargando, setCargando] = useState(false);
+  const { ejecutarCambioEstado } = useUpdateEstadoCliente();
+  const handleUpdate = async (nuevoEstado: boolean) => {
+    try {
+      setCargando(true);
+      await ejecutarCambioEstado(Number(id), nuevoEstado);
+      router.back();
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setCargando(false);
+    }
   };
 
   const inicial = typeof nombre === "string" ? nombre.charAt(0).toUpperCase() : "?";
-
   return (
     <View style={[commonS.screen, { justifyContent: "center", padding: 20 }]}>
       <View style={modalS.containerModal}>

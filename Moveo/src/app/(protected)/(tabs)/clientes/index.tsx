@@ -1,67 +1,55 @@
-import { useCallback, useEffect, useState } from "react";
-import { Text, TextInput, useTheme } from "react-native-paper";
-import {
-  View,
-  FlatList,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { Text, TextInput, useTheme, ActivityIndicator } from "react-native-paper";
+import { View, FlatList, Pressable } from "react-native";
 import { Link, useFocusEffect } from "expo-router";
-import { obtenerClientes } from "../../../../services/clienteService";
 import { clientStyles } from "../../../../styles/client.styles";
 import { commonStyles } from "../../../../styles/common.styles";
-import { Cliente } from "../../../../types/mockApi";
-
+import { useClientes } from "../../../../hooks/useClientes";
 
 export default function ClientesScreen() {
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [cargando, setCargando] = useState(true);
   const [busqueda, setBusqueda] = useState("");
-
   const theme = useTheme();
   const commonS = commonStyles(theme);
   const clientS = clientStyles(theme);
 
+  const { 
+    data: clientes = [], 
+    isLoading, 
+    isError, 
+    refetch 
+  } = useClientes();
 
-  useEffect(() => {
-    cargarDatos();
-  }, []);
-  
+  // Refrescar cuando la pantalla gana el foco 
   useFocusEffect(
     useCallback(() => {
-      cargarDatos();   
-    }, [])
+      refetch();
+    }, [refetch])
   );
 
-
-  const cargarDatos = async () => {
-    try {
-      setCargando(true); 
-      const data = await obtenerClientes();
-      setClientes(data);
-    } catch (error) {
-      console.error("Error cargando clientes", error);
-    } finally {
-      setCargando(false);
-    }
-  };
-
-  const clientesFiltrados = clientes.filter((c) => {
+  // FILTRADO
+  const clientesFiltrados = useMemo(() => {
     const texto = busqueda.toLowerCase();
-    return (
-      c.nombre.toLowerCase().includes(texto)
-    );
-  });
+    return clientes.filter((c) => c.nombre.toLowerCase().includes(texto));
+  }, [clientes, busqueda]);
 
 
-  // COMPRUEBA QUE LOS CLIENTES HAN CARGADO
-  if (cargando) {
+  // MANEJO DE ESTADOS
+  if (isLoading) {
     return (
       <View style={commonS.center}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text>
-          Cargando clientes...
-        </Text>
+        <Text style={{ marginTop: 10 }}>Cargando clientes de Supabase...</Text>
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={commonS.center}>
+        <Text>Error al conectar con el servidor.</Text>
+        <Pressable onPress={() => refetch()} style={{ marginTop: 10 }}>
+            <Text style={{ color: theme.colors.primary }}>Reintentar</Text>
+        </Pressable>
       </View>
     );
   }

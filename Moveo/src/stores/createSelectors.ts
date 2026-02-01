@@ -17,5 +17,3 @@ export const createSelectors = <S extends UseBoundStore<StoreApi<object>>>(
 };
 
 export type { WithSelectors };
-
-

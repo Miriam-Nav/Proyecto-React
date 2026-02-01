@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -14,61 +14,52 @@ import {
 import { useTheme } from "react-native-paper";
 import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
 import { InfoCard, InfoCardPedidos } from "../../../../components/CardApp";
-import { obtenerClientePorId, obtenerPedidosPorCliente, eliminarCliente } from "../../../../services/clienteService";
 import { commonStyles } from "../../../../styles/common.styles";
 import { formStyles } from "../../../../styles/form.styles";
 import { idStyles } from "../../../../styles/id.styles";
-import { Cliente, Pedido } from "../../../../types/mockApi";
 import { CustomHeader } from "../../../../components/HeaderApp";
+import { useClienteDetalle, useClienteAlquileres, useDeleteClienteAccion } from "../../../../hooks/useClientes";
 
 export default function ClienteDetalle() {
   const theme = useTheme();
   const commonS = commonStyles(theme);
   const idS = idStyles(theme);
   const formS = formStyles(theme);
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const idNum = Number(id);
 
-  const { id } = useLocalSearchParams<{ id?: string | string[] }>();
-  const [cliente, setCliente] = useState<Cliente | null>(null);
-  const [cargando, setCargando] = useState(true);
-  const [pedidosCliente, setPedidosCliente] = useState<Pedido[]>([]);
-
-  const cargarDetalle = useCallback(async () => {
-    const idNum = Number(Array.isArray(id) ? id[0] : id);
-    if (!idNum) return;
-
-    setCargando(true);
-    const data = await obtenerClientePorId(idNum);
-    setCliente(data ?? null);
-
-    const pedidos = await obtenerPedidosPorCliente(idNum);
-    setPedidosCliente(pedidos);
-
-    setCargando(false);
-  }, [id]);
+  // PETICIONES 
+  const { data: cliente, isLoading: loadingCliente, isError: errorCliente, refetch: refetchCliente } = useClienteDetalle(idNum);
+  const { data: alquileres = [], isLoading: loadingAlquileres, refetch: refetchAlquileres } = useClienteAlquileres(idNum);
+  const { ejecutarEliminar } = useDeleteClienteAccion(); 
+  const [borrando, setBorrando] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
-      cargarDetalle();
-    }, [cargarDetalle])
+      refetchCliente();
+      refetchAlquileres();
+    }, [refetchCliente, refetchAlquileres])
   );
-
-  if (cargando) {
+  
+  // ESTADOS DE CARGA 
+  if (loadingCliente || loadingAlquileres) {
     return (
       <View style={commonS.center}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={commonS.loadingText}>Cargando cliente...</Text>
+        <Text style={commonS.loadingText}>Cargando datos...</Text>
       </View>
     );
   }
 
-  if (!cliente) {
+  if (errorCliente || !cliente) {
     return (
       <View style={commonS.center}>
-        <Text>Cliente no encontrado</Text>
+        <Text>Error al cargar el cliente</Text>
+        <SecondaryButton text="Volver" onPress={() => router.back()} />
       </View>
     );
   }
-
+  
   return (
     <View style={{ flex: 1 }}>
       <Stack.Screen
@@ -119,19 +110,19 @@ export default function ClienteDetalle() {
         <View style={{padding: 20}}>
           <Text style={commonS.sectionTitle}>ÚLTIMOS PEDIDOS</Text>
 
-          {pedidosCliente.length === 0 ? (
+          {alquileres.length === 0 ? (
             <View style={[idS.infoCard, {alignItems: "center"}]}>
               <Text style={idS.emptyPedidosText}>
-                Este cliente no tiene pedidos.
+                Este cliente no tiene alquileres.
               </Text>
             </View>
           ) : (
-            pedidosCliente.map((pedido) => (
+            alquileres.map((pedido) => (
               <InfoCardPedidos
-                codigo={pedido.codigo}
-                estado={pedido.estado}
-                fechaInicio={pedido.fechaInicio}
-                fechaFin={pedido.fechaFin}
+                codigo={`ALQ-${pedido.id}`}
+                estado={(pedido.estado).toUpperCase()}
+                fechaInicio={pedido.fecha_inicio}
+                fechaFin={pedido.fecha_fin_prevista}
               />
             ))
           )}
@@ -159,13 +150,24 @@ export default function ClienteDetalle() {
           />
 
           {/* ELIMINAR */}
-          <PrimaryButton onPress={async () => {
-              const confirmar = confirm("¿Seguro que quieres eliminar este cliente?");
-              if (!confirmar) return;
-              await eliminarCliente(cliente.id);
-              router.back();
+          <PrimaryButton 
+            onPress={async () => {
+              const confirmado = confirm("¿Seguro que quieres eliminar este cliente?");
+              
+              if (confirmado) {
+                try {
+                  setBorrando(true);
+                  await ejecutarEliminar(idNum);
+                  router.back();
+                } catch (e) {
+                  const mensaje = e instanceof Error ? e.message : "No se pudo eliminar";
+                  alert(mensaje); 
+                } finally {
+                  setBorrando(false);
+                }
+              }
             }} 
-            text="Eliminar Cliente"
+            text={borrando ? "Eliminando..." : "Eliminar Cliente"}
             color={theme.colors.error}
           />
         </View>

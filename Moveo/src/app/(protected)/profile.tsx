@@ -1,34 +1,76 @@
-import React, { useContext, useState } from "react";
-import { View, ScrollView, Pressable } from "react-native";
+import React, {  } from "react";
+import { View, ScrollView, } from "react-native";
 import { Text, TextInput, useTheme, Avatar } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUserStore } from "../../stores/user.store";
 import { commonStyles } from "../../styles/common.styles";
 import { formStyles } from "../../styles/form.styles";
-import { AuthContext } from "../../providers/AuthProvider";
 import { CustomHeader } from "../../components/HeaderApp";
 import { PrimaryButton, SecondaryButton } from "../../components/ButtonApp";
+import { updateUserProfile } from "../../services/authService";
+import { supabase } from "../../config/supabaseClient";
+import { ControlledTextInput } from "../../components/ControlledTextInput";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ClienteFormValues, ClienteSchema } from "../../schemas/cliente.schema";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const theme = useTheme();
   const commonS = commonStyles(theme);
   const formS = formStyles(theme);
-
-  const { logOut } = useContext(AuthContext);
+  const clearUser = useUserStore.use.clearUser();
 
   // Datos de Zustand
   const { user, role, token, setUser } = useUserStore();
-  
-  // Estado local para el formulario
-  const [nombre, setNombre] = useState(user?.name || "");
 
-  const handleUpdate = () => {
-    if (user && role && token) {
-      setUser({ ...user, name: nombre }, role, token);
+  // Configuración de React Hook Form usando el esquema de cliente
+  const { control, handleSubmit, formState: { errors } } = useForm<ClienteFormValues>({
+    resolver: zodResolver(ClienteSchema),
+    defaultValues: {
+      nombre: user?.name || "",
+      email: user?.email || "",
+      telefono: "",
+    },
+    mode: "onChange",
+  });
+
+  const logOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      clearUser(); 
+      
+      router.replace("/");
+    } catch (error: any) {
+      const message = error instanceof Error ? error.message : "Error al salir";
+      console.error("Error al cerrar sesión:", message);
     }
   };
+
+  const handleUpdate = async (data: ClienteFormValues) => {
+    // Verifica que tenga los datos necesarios
+    if (!user?.id || !role || !token) {
+      console.log("Faltan datos para actualizar");
+      return;
+    }
+
+    try {
+      console.log("Actualizando en Supabase");
+      
+      const usuarioActualizado = await updateUserProfile({
+        id: user.id,
+        name: data.nombre, // Usamos data.nombre de RHF
+        email: user.email 
+      });
+
+      // Si Supabase responde OK actualiza Zustand
+      setUser(usuarioActualizado, role, token);
+
+    } catch (error: any) {
+      console.error("Error al guardar:", error.message);
+    }
+  }
 
   return (
     <ScrollView style={commonS.screen}>
@@ -51,13 +93,11 @@ export default function ProfileScreen() {
         <Text style={commonS.sectionTitle}>EDITAR DATOS</Text>
 
         <Text style={commonS.labelColor}>Nombre de usuario</Text>
-        <TextInput
-          mode="outlined"
-          value={nombre}
-          onChangeText={setNombre}
-          style={formS.input}
-          outlineStyle={formS.inputOutline}
-          contentStyle={formS.inputContent}
+        <ControlledTextInput
+          control={control}
+          name="nombre"
+          placeholder="Tu nombre"
+          errors={errors}
         />
 
         <Text style={commonS.labelColor}>Email</Text>
@@ -72,7 +112,7 @@ export default function ProfileScreen() {
 
         {/* BOTÓN GUARDAR*/}
         <View style={{ marginTop: 10 }}>
-          <PrimaryButton text={"GUARDAR CAMBIOS"} onPress={handleUpdate}/>
+          <PrimaryButton text={"GUARDAR CAMBIOS"} onPress={handleSubmit(handleUpdate)}/>
         </View>
       </View>
 

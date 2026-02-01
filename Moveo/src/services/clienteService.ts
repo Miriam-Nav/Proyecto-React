@@ -1,65 +1,108 @@
-import { Cliente, listClientes, clientes as DATA_MOCK, pedidos } from "../types/mockApi";
+import { supabase } from "../config/supabaseClient";
+import { Cliente } from "../types/Clientes";
 
+type ClienteRow = {
+    id: number;
+    nombre: string;
+    email: string;
+    telefono: string | null;
+    avatar_url: string | null;
+    notas: string | null;
+    activo: boolean;
+    direccion: string | null;
+    created_at: string | null;
+};
+
+const mapCliente = (row: ClienteRow): Cliente => {
+    return {
+        id: row.id,
+        nombre: row.nombre,
+        email: row.email,
+        telefono: row.telefono ?? undefined,
+        avatar_url: row.avatar_url ?? undefined,
+        notas: row.notas ?? undefined,
+        activo: row.activo,
+        direccion: row.direccion ?? "",
+        created_at: row.created_at ?? undefined,
+    };
+};
 
 // Obtener lista de clientes
-export const obtenerClientes = async (): Promise<Cliente[]> => {
-  return DATA_MOCK;
+export const getClientes = async (): Promise<Cliente[]> => {
+    const { data, error } = await supabase
+        .from("clientes")
+        .select("*");
+
+    if (error || !data) {
+        throw new Error("No se pudieron cargar los clientes.");
+    }
+
+    return data.map(mapCliente);
 };
 
 // Obtener cliente por ID
-export const obtenerClientePorId = async (id: number): Promise<Cliente | undefined> => {
-  const lista = DATA_MOCK;
-  return lista.find((cliente) => cliente.id === id);
+export const getClienteById = async (id: number): Promise<Cliente | undefined> => {
+    const { data, error } = await supabase
+        .from("clientes")
+        .select("id, nombre, email, telefono, avatar_url, notas, activo, direccion, created_at")
+        .eq("id", id)
+        .maybeSingle();
+
+    if (error) {
+        throw new Error("No se pudo cargar el cliente.");
+    }
+
+    return data ? mapCliente(data) : undefined;
 };
 
-// Obtener pedidos de cliente
-export const obtenerPedidosPorCliente = async (clienteId: number) => { 
-    return pedidos.filter((pedidos) => pedidos.clienteId === clienteId); 
-};
 
 // Crear cliente
-export const crearCliente = async (nuevo: Cliente): Promise<Cliente> => {
-  DATA_MOCK.push(nuevo);
-  return nuevo;
+// Acepta todo lo de Cliente excepto el id y el created_at
+export const createCliente = async (payload: Omit<Cliente, "id" | "created_at">): Promise<Cliente> => {
+    const { data, error } = await supabase
+        .from("clientes")
+        .insert(payload) 
+        .select()
+        .single();
+
+    if (error || !data) throw new Error("No se pudo crear el cliente.");
+
+    return mapCliente(data);
 };
 
 // Editar cliente
-export const actualizarCliente = async ( id: number, datos: Partial<Cliente>): Promise<Cliente | undefined> => {
+export const updateCliente = async (payload: Cliente): Promise<Cliente | undefined> => {
+    const { error: updateError } = await supabase
+        .from("clientes")
+        .update({
+            nombre: payload.nombre,
+            email: payload.email,
+            telefono: payload.telefono ?? null,
+            avatar_url: payload.avatar_url ?? null,
+            notas: payload.notas ?? null,
+            activo: payload.activo,
+            direccion: payload.direccion,
+        })
+        .eq("id", payload.id);
 
-  // Buscar el cliente por ID
-  const cliente = DATA_MOCK.find((cliente) => cliente.id === id);
+    if (updateError) {
+        throw new Error("No se pudo guardar el cliente.");
+    }
 
-  if (!cliente) {
-    return undefined;
-  }
-
-  // Obten su posición en array
-  const index = DATA_MOCK.indexOf(cliente);
-
-  // Crear nuevo objeto con los datos actualizados
-  const clienteActualizado = {
-    ...cliente,
-    ...datos,
-  };
-
-  // Reemplazar el cliente por el nuevo
-  DATA_MOCK[index] = clienteActualizado;
-
-  // Devolver el cliente actualizado
-  return clienteActualizado;
+    return getClienteById(payload.id);
 };
 
 
 // Eliminar cliente
-export const eliminarCliente = async (id: number): Promise<boolean> => {
+export const deleteCliente = async (id: number): Promise<boolean> => {
+    const { error } = await supabase
+        .from("clientes")
+        .delete()
+        .eq("id", id);
 
-  // Buscar el cliente por ID
-  const index = DATA_MOCK.findIndex((cliente) => cliente.id === id);
+    if (error) {
+        throw new Error("No se pudo eliminar el cliente.");
+    }
 
-  if (index === -1) {
-    return false;
-  }
-
-  DATA_MOCK.splice(index, 1);
-  return true;
+    return true;
 };

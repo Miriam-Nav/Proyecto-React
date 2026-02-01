@@ -1,47 +1,51 @@
-import React, { useContext, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View, Pressable, ScrollView } from "react-native";
 import { Text, Button, Divider, IconButton, useTheme } from "react-native-paper";
 import { logginStyles } from "../styles/loggin.styles";
 import { commonStyles } from "../styles/common.styles";
-import { AuthContext } from "../providers/AuthProvider";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginFormValues, loginSchema } from "../schemas/auth.schema";
+import { LoginFormValues, loginSchema, RegisterFormValues, registerSchema } from "../schemas/auth.schema";
 import { ControlledEmailInput, ControlledPasswordInput } from "../components/ControlledTextInput";
+import { logIn, register } from "../services/authService";
+import { useUserStore } from "../stores/user.store";
 
 export default function LoginScreen() {
   const theme = useTheme();
   const commonS = commonStyles(theme);
   const logginS = logginStyles(theme);
 
-  // const setUser = useUserStore((state) => state.setUser);
-  // const [showPassword, setShowPassword] = useState(false);
-  
-  // USUARIO 
-  //  - admin@alquilerapp.com 
-  //  - operario1@alquilerapp.com
-  //
-  // CONTRASEÑA PARA AMBOS: 123456
+  const setUser = useUserStore((state) => state.setUser);
+  const [mode] = useState<"login" | "register">("login");
+  const isRegister = useMemo(() => mode === "register", [mode]);
 
-  const { 
-    control, 
-    handleSubmit, 
-    formState: { errors, isSubmitting }, 
-  } = useForm<LoginFormValues>({ 
-    resolver: zodResolver(loginSchema), 
-    mode: "onBlur", 
-    defaultValues: { email: "", password: "" }, 
-  });
+    const loginForm = useForm<LoginFormValues>({
+        resolver: zodResolver(loginSchema),
+        mode: "onBlur",
+        defaultValues: { email: "", password: "" },
+    });
 
-  const { logIn } = useContext(AuthContext);
+    const registerForm = useForm<RegisterFormValues>({
+        resolver: zodResolver(registerSchema),
+        mode: "onBlur",
+        defaultValues: { email: "", password: "", confirmPassword: "" },
+    });
 
-  const onSubmit = async (data: LoginFormValues) => {
-      try {
-          await logIn(data.email, data.password);
-      } catch (error) {
-          console.error("Fallo del login simulado", error);
-      }
-  };
+    const form = isRegister ? registerForm : loginForm;
+    const {
+        control,
+        formState: { errors, isSubmitting },
+    } = form;
+
+    const onSubmitLogin = async (data: LoginFormValues) => {
+        try {
+            const session = await logIn(data.email, data.password);
+            console.log(session);
+            setUser(session.user, session.role, session.token);
+        } catch (e) {
+            console.error("Error:", e);
+        }
+    };
   
   return (
     <ScrollView 
@@ -74,10 +78,6 @@ export default function LoginScreen() {
             errors={errors}
             leftIcon="email-outline"
           />
-
-          {errors.email && (
-            <Text style={{ color: theme.colors.error }}>{errors.email.message}</Text>
-          )}
         </View>
 
         {/* PASSWORD */}
@@ -90,10 +90,6 @@ export default function LoginScreen() {
             placeholder="••••••••"
             errors={errors}
           />
-
-          {errors.password && (
-            <Text style={{ color: theme.colors.error }}>{errors.password.message}</Text>
-          )}
         </View>
 
 
@@ -105,11 +101,12 @@ export default function LoginScreen() {
         {/* LOGIN BUTTON */}
         <Button 
           mode="contained" 
-          onPress={handleSubmit(onSubmit)}
+          onPress={loginForm.handleSubmit(onSubmitLogin)}
+          loading={isSubmitting}
           style={logginS.buttonLoggin}
           labelStyle={logginS.buttonLabelLoggin}
         >
-          INICIAR SESIÓN
+          {isSubmitting ? "CARGANDO..." : "INICIAR SESIÓN"}
         </Button>
 
         {/* DIVIDER */}

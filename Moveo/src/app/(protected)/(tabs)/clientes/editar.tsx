@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator, MD3Theme, Text, useTheme } from "react-native-paper";
+import { useEffect } from "react";
+import { ActivityIndicator, Text, useTheme } from "react-native-paper";
 import { View, ScrollView} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
@@ -7,9 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ClienteFormValues, ClienteSchema } from "../../../../schemas/cliente.schema";
 import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
 import { ControlledTextInput } from "../../../../components/ControlledTextInput";
-import { actualizarCliente, obtenerClientePorId } from "../../../../services/clienteService";
 import { formStyles } from "../../../../styles/form.styles";
 import { commonStyles } from "../../../../styles/common.styles";
+import { useClienteDetalle, useUpdateClienteAccion } from "../../../../hooks/useClientes";
 
 export default function EditarCliente() {
   const theme = useTheme();
@@ -18,62 +18,49 @@ export default function EditarCliente() {
 
   const { id } = useLocalSearchParams<{ id?: string | string[] }>();
   const router = useRouter();
-  const [cargando, setCargando] = useState(true);
+  const idNum = Number(id);
 
-  const {
-    control,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<ClienteFormValues>({
+  const { ejecutarActualizar } = useUpdateClienteAccion();
+  const { data: cliente, isLoading } = useClienteDetalle(idNum);
+
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<ClienteFormValues>({
     resolver: zodResolver(ClienteSchema),
-    defaultValues: {
-      nombre: "",
-      email: "",
-      telefono: "",
-    },
-    mode: "onBlur",
+    defaultValues: { nombre: "", email: "", telefono: "" },
   });
 
-  // Cargar datos del cliente
+  // Sincroniza los datos del cliente con el formulario
   useEffect(() => {
-    const cargar = async () => {
-      const idNum = Number(Array.isArray(id) ? id[0] : id);
-      const data = await obtenerClientePorId(idNum);
+    if (cliente) {
+      reset({
+        nombre: cliente.nombre,
+        email: cliente.email ?? "",
+        telefono: cliente.telefono ?? "",
+      });
+    }
+  }, [cliente, reset]);
 
-      if (data) {
-        setValue("nombre", data.nombre);
-        setValue("email", data.email ?? "");
-        setValue("telefono", data.telefono ?? "");
-      }
-
-      setCargando(false);
-    };
-
-    cargar();
-  }, [id]);
-
-  // Guardar cambios
   const onSubmit = async (data: ClienteFormValues) => {
-    const idNum = Number(Array.isArray(id) ? id[0] : id);
+    try {
+      await ejecutarActualizar(idNum, {
+        ...cliente, 
+        nombre: data.nombre,
+        email: data.email,
+        telefono: data.telefono,
+      });
 
-    await actualizarCliente(idNum, {
-      nombre: data.nombre,
-      email: data.email || "",
-      telefono: data.telefono || "",
-    });
-
-    router.back();
+      router.back();
+    } catch (error) {
+      console.log("Error. No se pudo actualizar", error)
+    }
   };
 
-  if (cargando) {
+  if (isLoading) {
     return (
-      <View style={commonS.center}>
-        <ActivityIndicator size="large" color={theme.colors.secondary} />
+      <View style={commonStyles(theme).center}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
-
   return (
     <ScrollView contentContainerStyle={[commonS.screen, {padding: 20, justifyContent: "center"}]}>
       <View style={formS.container}>
