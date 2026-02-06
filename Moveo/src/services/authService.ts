@@ -14,6 +14,7 @@ export type UpdateUserPayload = {
   id: number;
   name: string;
   email: string;
+  avatarUrl?: string;
 };
 
 // Tipo para lo que viene de la base de datos
@@ -90,7 +91,7 @@ export const logIn = async (email: string, password: string): Promise<AuthSessio
 };
 
 // REGISTRO
-export const register = async (email: string, password: string): Promise<AuthSession> => {
+export const register = async (email: string, password: string, nombre: string): Promise<AuthSession> => {
     const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -100,26 +101,31 @@ export const register = async (email: string, password: string): Promise<AuthSes
         throw new Error("No se pudo crear la cuenta.");
     }
 
+    // ID de la tabla de autenticación
     const authUserId = authData.user.id;
-    const baseName = email.split("@")[0]?.trim() || "Nuevo usuario";
 
     const { error: profileError } = await supabase.from("users").insert({
+        // Aqui se sincroniza el usuario con el ID de la tabla de autenticación
         auth_user_id: authUserId,
         role_id: 1,
-        name: baseName,
+        name: nombre.trim(),
         email: email.trim(),
         avatar_url: null,
     });
 
     if (profileError) {
-        throw new Error("Error al crear el perfil de usuario.");
-    }
+        console.error("Error al insertar perfil:", profileError);
+        throw new Error("Error al crear el perfil de usuario en la base de datos.");
+    }   
 
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     // Si no hay sesión requiere confirmar email
     if (!authData.session) {
         throw new Error("Revisa tu correo para confirmar tu cuenta.");
     }
 
+    // Obtener el perfil completo (incluyendo el rol) para el Store
     const { user, role } = await fetchProfileByAuthId(authUserId);
 
     return {
@@ -135,11 +141,24 @@ export const updateUserProfile = async (payload: UpdateUserPayload): Promise<Use
     // Verifica que el ID existe
     if (!payload.id) throw new Error("ID de usuario no proporcionado");
 
+    interface UserUpdateRow {
+        name?: string;
+        email?: string;
+        avatar_url?: string;
+        role_id?: number;
+    }
+    // Construimos el objeto de actualización dinámicamente
+    const updateData: UserUpdateRow = {};
+    if (payload.name) {
+        updateData.name = payload.name.trim();
+    }
+    if (payload.avatarUrl) {
+        updateData.avatar_url = payload.avatarUrl; 
+    }
+
     const { data, error } = await supabase
         .from("users")
-        .update({
-            name: payload.name.trim(),
-        })
+        .update( updateData )
         .eq("id", payload.id)
         .select()
         .single();
@@ -155,6 +174,6 @@ export const updateUserProfile = async (payload: UpdateUserPayload): Promise<Use
         roleId: data.role_id,
         name: data.name,
         email: data.email,
-        avatarUrl: data.avatar_url ?? undefined,
+        avatarUrl: data.avatar_url,
     };
 };

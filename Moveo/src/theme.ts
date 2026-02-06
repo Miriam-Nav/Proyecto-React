@@ -8,7 +8,7 @@ export const lightThemeColors = {
   primary: "#ee1d77",
   onPrimary: "#FFFFFF",
 
-  secondary: "#a138ec",
+  secondary: "#c285f4",
   onSecondary: "#FFFFFF",
 
   error: "#e42948", 

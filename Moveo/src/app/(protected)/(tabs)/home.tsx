@@ -33,8 +33,22 @@ export default function HomeScreen() {
               ROL: {role?.name}
             </Text>
           </View>
-          <View style={[idS.avatar, { width: 65, height: 65, borderWidth:0, marginBottom: 10}]} >
-              <Text style={[idS.avatarText, { fontSize: 26 }]}>{user?.name?.substring(0, 2).toUpperCase() || "U"}</Text>
+
+          <View style={[idS.avatar, { width: 70, height: 70, borderWidth:0, marginBottom: 10}]} >
+
+          {user?.avatarUrl ? (
+              <Avatar.Image 
+                source={{ uri: user.avatarUrl + '?t=' + new Date().getTime() }} 
+                style={{ marginLeft: 0.35, backgroundColor: 'transparent' }} 
+              />
+            ) : (
+              <Avatar.Text 
+                size={80} 
+                label={user?.name?.substring(0, 2).toUpperCase() || "US"} 
+                style={{ backgroundColor: theme.colors.primary, marginBottom: 15 }}
+                labelStyle={{ fontFamily: 'monospace' }}
+              />
+            )} 
           </View>
         </View>
       </View>

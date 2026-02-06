@@ -103,7 +103,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
         if (!isLoggedIn && inProtectedGroup) {
             // Si no hay sesión va al Login
-            router.replace("/login");
+            router.replace("/");
         } else if (isLoggedIn && !inProtectedGroup) {
             // Si ya hay sesión entra a la App
             router.replace("/home");

@@ -1,6 +1,6 @@
-import React, {  } from "react";
-import { View, ScrollView, } from "react-native";
-import { Text, TextInput, useTheme, Avatar } from "react-native-paper";
+import React, { useState } from "react";
+import { View, ScrollView, Alert, } from "react-native";
+import { Text, TextInput, useTheme, Avatar, IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { useUserStore } from "../../stores/user.store";
 import { commonStyles } from "../../styles/common.styles";
@@ -12,7 +12,9 @@ import { supabase } from "../../config/supabaseClient";
 import { ControlledTextInput } from "../../components/ControlledTextInput";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ClienteFormValues, ClienteSchema } from "../../schemas/cliente.schema";
+import * as ImagePicker from "expo-image-picker";
+import { uploadUserAvatar } from "../../services/profileService";
+import { UsuarioFormValues, UsuarioSchema } from "../../schemas/usuario.schema";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -24,13 +26,14 @@ export default function ProfileScreen() {
   // Datos de Zustand
   const { user, role, token, setUser } = useUserStore();
 
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  
   // Configuración de React Hook Form usando el esquema de cliente
-  const { control, handleSubmit, formState: { errors } } = useForm<ClienteFormValues>({
-    resolver: zodResolver(ClienteSchema),
+  const { control, handleSubmit, formState: { errors } } = useForm<UsuarioFormValues>({
+    resolver: zodResolver(UsuarioSchema),
     defaultValues: {
       nombre: user?.name || "",
       email: user?.email || "",
-      telefono: "",
     },
     mode: "onChange",
   });
@@ -48,7 +51,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleUpdate = async (data: ClienteFormValues) => {
+  const handleUpdate = async (data: UsuarioFormValues) => {
     // Verifica que tenga los datos necesarios
     if (!user?.id || !role || !token) {
       console.log("Faltan datos para actualizar");
@@ -60,8 +63,8 @@ export default function ProfileScreen() {
       
       const usuarioActualizado = await updateUserProfile({
         id: user.id,
-        name: data.nombre, // Usamos data.nombre de RHF
-        email: user.email 
+        name: data.nombre,
+        email: user.email,
       });
 
       // Si Supabase responde OK actualiza Zustand
@@ -72,6 +75,43 @@ export default function ProfileScreen() {
     }
   }
 
+  const handlePickAvatar = async () => {
+    if (!user || isUploadingAvatar) return;
+
+    // Pedir permisos 
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Error", "Necesitamos permiso para acceder a la galería");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (result.canceled || !result.assets[0]) return;
+
+    try {
+      setIsUploadingAvatar(true);
+      
+      const updatedUser = await uploadUserAvatar({
+        userId: user.id,
+        fileUri: result.assets[0].uri,
+      });
+
+      // Actualiza Zustand
+      setUser(updatedUser, role!, token!);
+
+    } catch (error) {
+      Alert.alert("Error", "No se pudo actualizar la foto");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
   return (
     <ScrollView style={commonS.screen}>
       {/* HEADER con Flecha */}
@@ -79,14 +119,46 @@ export default function ProfileScreen() {
 
       {/* AVATAR Y ROL */}
       <View style={[formS.container, { alignItems: 'center' }]}>
-        <Avatar.Text 
-          size={80} 
-          label={user?.name?.substring(0, 2).toUpperCase() || "US"} 
-          style={{ backgroundColor: theme.colors.primary, marginBottom: 15 }}
-          labelStyle={{ fontFamily: 'monospace' }}
+      <View style={{ position: 'relative' }}> 
+        {/* CONTENEDOR DEL BORDE */}
+        <View style={{
+          borderRadius: 100,
+          padding: 3,
+          marginBottom: 15,
+          backgroundColor: theme.colors.primary,
+        }}>
+          {user?.avatarUrl ? (
+            <Avatar.Image 
+              size={80} 
+              source={{ uri: user.avatarUrl + '?t=' + new Date().getTime() }} 
+              style={{ backgroundColor: 'transparent' }} 
+            />
+          ) : (
+            <Avatar.Text 
+              size={80} 
+              label={user?.name?.substring(0, 2).toUpperCase() || "US"} 
+              style={{ backgroundColor: theme.colors.primary }}
+              labelStyle={{ fontFamily: 'monospace' }}
+            />
+          )}
+        </View>
+        
+        {/* BOTÓN CÁMARA */}
+        <IconButton icon="camera" mode="contained" size={20}
+          containerColor={theme.colors.secondary} iconColor={theme.colors.surface}
+          onPress={handlePickAvatar}
+          style={{ 
+            position: 'absolute', 
+            bottom: 15,
+            right: -5, 
+            margin: 0, 
+            borderWidth: 2, 
+            borderColor: theme.colors.surface
+          }}
         />
-        <Text style={commonS.labelColor}>ROL ACTUAL: {role?.name}</Text>
       </View>
+      <Text style={commonS.labelColor}>ROL ACTUAL: {role?.name}</Text>
+    </View>
 
       {/* FORMULARIO DE EDICIÓN */}
       <View style={formS.container}>
@@ -109,7 +181,7 @@ export default function ProfileScreen() {
           outlineStyle={formS.inputOutline}
           contentStyle={formS.inputContent}
         />
-
+        
         {/* BOTÓN GUARDAR*/}
         <View style={{ marginTop: 10 }}>
           <PrimaryButton text={"GUARDAR CAMBIOS"} onPress={handleSubmit(handleUpdate)}/>

@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ThemeProvider } from "../providers/ThemeProvider"; 
 import { AuthProvider } from "../providers/AuthProvider"; 
-import { QueryProvider } from "../providers/QueryProvider"; // El que acabamos de crear
+import { QueryProvider } from "../providers/QueryProvider";
 
 export default function RootLayout() {
   return (

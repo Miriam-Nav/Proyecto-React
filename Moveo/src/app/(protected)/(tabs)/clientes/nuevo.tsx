@@ -32,7 +32,6 @@ export default function NuevoCliente() {
       await ejecutarCrear({
         ...data,
         activo: true,
-        direccion: "",
         notas: ""
       });
       router.back();

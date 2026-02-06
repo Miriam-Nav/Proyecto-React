@@ -52,7 +52,7 @@ export const useUpdateClienteAccion = () => {
     queryClient.invalidateQueries({ queryKey: ["clientes"] });
     queryClient.invalidateQueries({ queryKey: ["cliente", id] });
     return res;
-};
+  };
 
   return { ejecutarActualizar };
 };
