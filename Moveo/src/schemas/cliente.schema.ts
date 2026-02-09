@@ -17,6 +17,9 @@ export const ClienteSchema = z.object({
     .min(6, "Teléfono demasiado corto")
     .optional()
     .or(z.literal("")),
+
+  direccion: z
+    .string()
 });
 
 export type ClienteFormValues = z.infer<typeof ClienteSchema>;

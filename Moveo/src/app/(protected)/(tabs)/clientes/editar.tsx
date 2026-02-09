@@ -23,9 +23,9 @@ export default function EditarCliente() {
   const { ejecutarActualizar } = useUpdateClienteAccion();
   const { data: cliente, isLoading } = useClienteDetalle(idNum);
 
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<ClienteFormValues>({
+  const { control, handleSubmit, reset, setError, formState: { errors } } = useForm<ClienteFormValues>({
     resolver: zodResolver(ClienteSchema),
-    defaultValues: { nombre: "", email: "", telefono: "" },
+    defaultValues: { nombre: "", email: "", telefono: "", direccion: "" },
   });
 
   // Sincroniza los datos del cliente con el formulario
@@ -35,6 +35,7 @@ export default function EditarCliente() {
         nombre: cliente.nombre,
         email: cliente.email ?? "",
         telefono: cliente.telefono ?? "",
+        direccion: cliente.direccion ?? "",
       });
     }
   }, [cliente, reset]);
@@ -46,10 +47,19 @@ export default function EditarCliente() {
         nombre: data.nombre,
         email: data.email,
         telefono: data.telefono,
+        direccion: data.direccion
       });
 
       router.back();
     } catch (error) {
+
+      if (error.message.includes("registrado") || error.message.includes("email")) {
+        setError("email", { type: "manual", message: error.message });
+      } else {
+        // Si es otro tipo de error
+        alert("Error: " + error.message);
+      }
+      
       console.log("Error. No se pudo actualizar", error)
     }
   };
@@ -87,6 +97,14 @@ export default function EditarCliente() {
           control={control}
           name="telefono"
           placeholder="Teléfono"
+          errors={errors}
+        />
+
+        {/* -------- DIRECCIÓN -------- */}
+        <ControlledTextInput
+          control={control}
+          name="direccion"
+          placeholder="Dirección"
           errors={errors}
         />
 

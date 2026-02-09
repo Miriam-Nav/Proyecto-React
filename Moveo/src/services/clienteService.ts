@@ -27,6 +27,27 @@ const mapCliente = (row: ClienteRow): Cliente => {
     };
 };
 
+// Comprueba si un email ya existe en la tabla de clientes.
+// Si se pasa un excludeId, se ignoramos (para editar).
+export const checkEmailDuplicado = async (email: string, excludeId?: number): Promise<boolean> => {
+    if (!email) return false;
+
+    let query = supabase
+        .from("clientes")
+        .select("id")
+        .eq("email", email.trim().toLowerCase());
+
+    // Si se está editando
+    if (excludeId) {
+        query = query.neq("id", excludeId);
+    }
+
+    const { data, error } = await query.maybeSingle();
+    
+    if (error) return false;
+    return !!data; // Retorna true si encontró a alguien
+};
+
 // Obtener lista de clientes
 export const getClientes = async (): Promise<Cliente[]> => {
     const { data, error } = await supabase
@@ -59,6 +80,12 @@ export const getClienteById = async (id: number): Promise<Cliente | undefined> =
 // Crear cliente
 // Acepta todo lo de Cliente excepto el id y el created_at
 export const createCliente = async (payload: Omit<Cliente, "id" | "created_at">): Promise<Cliente> => {
+    // Valida duplicado antes de insertar
+    const esDuplicado = await checkEmailDuplicado(payload.email);
+    if (esDuplicado) {
+        throw new Error("El correo electrónico ya está registrado con otro cliente.");
+    }
+    
     const { data, error } = await supabase
         .from("clientes")
         .insert(payload) 
@@ -72,6 +99,12 @@ export const createCliente = async (payload: Omit<Cliente, "id" | "created_at">)
 
 // Editar cliente
 export const updateCliente = async (payload: Cliente): Promise<Cliente | undefined> => {
+    // Validar si el nuevo email ya lo tiene OTRO cliente
+    const esDuplicado = await checkEmailDuplicado(payload.email, payload.id);
+    if (esDuplicado) {
+        throw new Error("El correo electrónico ya está registrado con otro cliente.");
+    }
+
     const { error: updateError } = await supabase
         .from("clientes")
         .update({

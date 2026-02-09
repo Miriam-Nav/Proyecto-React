@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormValues, loginSchema, RegisterFormValues, registerSchema } from "../schemas/auth.schema";
 import { ControlledEmailInput, ControlledPasswordInput, ControlledTextInput } from "../components/ControlledTextInput";
-import { logIn, register } from "../services/authService";
+import { isEmailInUse, logIn, register } from "../services/authService";
 import { useUserStore } from "../stores/user.store";
 
 export default function LoginScreen() {
@@ -21,51 +21,59 @@ export default function LoginScreen() {
   const [mode, setMode] = useState<"login" | "register">("login");
   const isRegister = useMemo(() => mode === "register", [mode]);
 
-    const loginForm = useForm<LoginFormValues>({
-        resolver: zodResolver(loginSchema),
-        mode: "onBlur",
-        defaultValues: { email: "", password: "" },
-    });
+  const loginForm = useForm<LoginFormValues>({
+      resolver: zodResolver(loginSchema),
+      mode: "onBlur",
+      defaultValues: { email: "", password: "" },
+  });
 
-    const registerForm = useForm<RegisterFormValues>({
-        resolver: zodResolver(registerSchema),
-        mode: "onBlur",
-        defaultValues: { nombre: "", email: "", password: "", confirmPassword: "" },
-    });
+  const registerForm = useForm<RegisterFormValues>({
+      resolver: zodResolver(registerSchema),
+      mode: "onBlur",
+      defaultValues: { nombre: "", email: "", password: "", confirmPassword: "" },
+  });
 
-    const form = isRegister ? registerForm : loginForm;
-    const {
-        control,
-        formState: { errors, isSubmitting },
-    } = form;
+  const form = isRegister ? registerForm : loginForm;
+  const { control, setError, formState: { errors, isSubmitting }} = form;
 
-    const onSubmitLogin = async (data: LoginFormValues) => {
-        try {
-            const session = await logIn(data.email, data.password);
-            console.log(session);
-            setUser(session.user, session.role, session.token);
-        } catch (e) {
-            console.error("Error:", e);
-        }
-    };
-
-    const onSubmitRegister = async (data: RegisterFormValues) => {
+  const onSubmitLogin = async (data: LoginFormValues) => {
       try {
-        const session = await register(data.email, data.password, data.nombre);
-        setUser(session.user, session.role, session.token);
-        setMode("login");
+          const session = await logIn(data.email, data.password);
+          console.log(session);
+          setUser(session.user, session.role, session.token);
+          
       } catch (e) {
-        const message = e instanceof Error ? e.message : "No se pudo crear la cuenta";
-        Alert.alert("Error", message);
+        if (e.message.includes("incorrectos") || e.message.includes("invalid")) {
+          setError("email", { type: "manual", message: "Datos introdcidos incorrectos." });
+        } 
+        
+        console.error("Error:", e);
       }
-    };
+  };
 
-    const toggleMode = () => {
-        setMode(isRegister ? "login" : "register");
-        loginForm.reset();
-        registerForm.reset();
-    };
-  
+  const onSubmitRegister = async (data: RegisterFormValues) => {
+    try {
+      const emailOcupado = await isEmailInUse(data.email);
+
+      if (emailOcupado) {
+        setError("email", { type: "manual", message: "Este correo ya está registrado." });
+        return; 
+      }
+      
+      const session = await register(data.email, data.password, data.nombre);
+      setUser(session.user, session.role, session.token);
+      setMode("login");
+    } catch (e) {
+      console.error("Error. No se pudo crear la cuenta:", e.message );
+    }
+  };
+
+  const toggleMode = () => {
+      setMode(isRegister ? "login" : "register");
+      loginForm.reset();
+      registerForm.reset();
+  };
+
   return (
     <ScrollView 
       contentContainerStyle={logginS.screenLoggin}

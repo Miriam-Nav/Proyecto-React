@@ -21,9 +21,9 @@ export default function NuevoCliente() {
   const { ejecutarCrear } = useNuevoClienteAccion();
   const [cargando, setCargando] = useState(false);
 
-  const { control, handleSubmit, formState: { errors } } = useForm<ClienteFormValues>({
+  const { control, handleSubmit, setError, formState: { errors } } = useForm<ClienteFormValues>({
     resolver: zodResolver(ClienteSchema),
-    defaultValues: { nombre: "", email: "", telefono: "" },
+    defaultValues: { nombre: "", email: "", telefono: "", direccion: "" },
   });
 
   const onSubmit = async (data: ClienteFormValues) => {
@@ -36,7 +36,13 @@ export default function NuevoCliente() {
       });
       router.back();
     } catch (error) {
-      console.log(error);
+      if (error.message.includes("registrado") || error.message.includes("email")) {
+        setError("email", { type: "manual", message: error.message });
+      } else {
+        // Si es otro tipo de error
+        alert("Error: " + error.message);
+      }
+      console.log("Error: " + error.message);
     } finally {
       setCargando(false);
     }
@@ -70,6 +76,14 @@ export default function NuevoCliente() {
           errors={errors}
         />
 
+        {/* -------- DIRECCIÓN -------- */}
+        <ControlledTextInput
+          control={control}
+          name="direccion"
+          placeholder="Dirección"
+          errors={errors}
+        />
+
         {/* -------- BOTONES -------- */}
         <View style={formS.buttons}>
           {/* handleSubmit valida con Zod y luego ejecuta onSubmit */}
@@ -84,3 +98,7 @@ export default function NuevoCliente() {
     </ScrollView>
   );
 }
+function setError(arg0: string, arg1: { type: string; message: any; }) {
+  throw new Error("Function not implemented.");
+}
+

@@ -137,7 +137,6 @@ export default function ProfileScreen() {
             <Avatar.Text 
               size={80} 
               label={user?.name?.substring(0, 2).toUpperCase() || "US"} 
-              style={{ backgroundColor: theme.colors.primary }}
               labelStyle={{ fontFamily: 'monospace' }}
             />
           )}

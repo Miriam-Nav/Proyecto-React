@@ -5,7 +5,6 @@ import { useRouter } from "expo-router";
 import { useUserStore } from "../../../stores/user.store";
 import { commonStyles } from "../../../styles/common.styles";
 import { formStyles } from "../../../styles/form.styles";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { idStyles } from "../../../styles/id.styles";
 import { SecondaryButton } from "../../../components/ButtonApp";
 
@@ -13,7 +12,6 @@ export default function HomeScreen() {
   const router = useRouter();
   const theme = useTheme();
   const commonS = commonStyles(theme);
-  const formS = formStyles(theme);
   const idS = idStyles(theme);
 
   // Datos y el ROL de Zustand
@@ -45,7 +43,6 @@ export default function HomeScreen() {
               <Avatar.Text 
                 size={80} 
                 label={user?.name?.substring(0, 2).toUpperCase() || "US"} 
-                style={{ backgroundColor: theme.colors.primary, marginBottom: 15 }}
                 labelStyle={{ fontFamily: 'monospace' }}
               />
             )} 

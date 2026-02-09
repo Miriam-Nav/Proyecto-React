@@ -1,16 +1,6 @@
 import React, { useCallback, useState } from "react";
-import {
-  View,
-  Text,
-  ActivityIndicator,
-  ScrollView,
-} from "react-native";
-import {
-  useLocalSearchParams,
-  Stack,
-  useFocusEffect,
-  router,
-} from "expo-router";
+import { View, Text, ActivityIndicator, ScrollView, Linking, Platform } from "react-native";
+import { useLocalSearchParams, Stack, useFocusEffect, router } from "expo-router";
 import { useTheme } from "react-native-paper";
 import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
 import { InfoCard, InfoCardPedidos } from "../../../../components/CardApp";
@@ -33,6 +23,25 @@ export default function ClienteDetalle() {
   const { data: alquileres = [], isLoading: loadingAlquileres, refetch: refetchAlquileres } = useClienteAlquileres(idNum);
   const { ejecutarEliminar } = useDeleteClienteAccion(); 
   const [borrando, setBorrando] = useState(false);
+
+  const abrirMapa = () => {
+    // Comprueba que el cliente tenga dirección
+    if (!cliente?.direccion) {
+      alert("Este cliente no tiene una dirección registrada.");
+      return;
+    }
+
+    // Prepara la dirección para la URL
+    const direccionCodificada = encodeURIComponent(cliente.direccion);
+    
+    // URL 
+    const url = `https://www.google.com/maps/search/?api=1&query=${direccionCodificada}`;
+
+    // Abre la URL
+    Linking.openURL(url).catch((err) => 
+      console.error("No se pudo abrir el mapa", err)
+    );
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -104,6 +113,7 @@ export default function ClienteDetalle() {
           <Text style={commonS.sectionTitle}>INFORMACIÓN DE CONTACTO</Text>
           <InfoCard label="Email" value={cliente.email} />
           <InfoCard label="Teléfono" value={cliente.telefono} />
+          <InfoCard label="Dirección" value={cliente.direccion} icon="map-marker" onIconPress={abrirMapa}/>
         </View>
 
         {/* PEDIDOS */}

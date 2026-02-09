@@ -70,6 +70,30 @@ export const fetchProfileByAuthId = async (authUserId: string) => {
     return mapProfile(data as unknown as UserProfileRow);
 };
 
+/**
+ * Comprueba si un email ya está registrado en la tabla de perfiles.
+ * Útil para validaciones previas al registro o actualización.
+ */
+export const isEmailInUse = async (email: string, excludeId?: number): Promise<boolean> => {
+  if (!email) return false;
+
+  let query = supabase
+    .from("users")
+    .select("id")
+    .eq("email", email.trim().toLowerCase());
+
+  if (excludeId) {
+    query = query.neq("id", excludeId);
+  }
+
+  const { data, error } = await query.maybeSingle();
+
+  // Si hay error de conexión devolvemos false (o manejamos según prefieras)
+  if (error) return false; 
+  
+  return !!data; // true si encontró a alguien, false si no
+};
+
 
 // LOGIN
 export const logIn = async (email: string, password: string): Promise<AuthSession> => {
@@ -97,9 +121,17 @@ export const register = async (email: string, password: string, nombre: string):
         password,
     });
 
-    if (authError || !authData.user) {
-        throw new Error("No se pudo crear la cuenta.");
+    if (authError) {
+        if (authError.message.includes("already registered")) {
+            throw new Error("Este correo electrónico ya está registrado.");
+        }
+        if (authError.message.includes("Password should be")) {
+            throw new Error("La contraseña es demasiado débil.");
+        }
+        throw new Error(authError.message);
     }
+
+    if (!authData.user) throw new Error("No se pudo crear la cuenta.");
 
     // ID de la tabla de autenticación
     const authUserId = authData.user.id;

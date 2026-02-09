@@ -35,7 +35,7 @@ export function ControlledTextInput({ control, name, placeholder, errors }: Prop
             contentStyle={formS.inputContent}
           />
           {errors[name] && (
-            <HelperText type="error" visible={!!errors[name]} style={{ fontWeight: 'bold' }}>
+            <HelperText type="error" visible={!!errors[name]} style={{ fontWeight: 'bold', fontFamily: 'monospace', }}>
               {errors[name]?.message as string}
             </HelperText>
           )}
@@ -69,7 +69,7 @@ export function ControlledEmailInput({ control, name, placeholder, errors, leftI
             contentStyle={formS.inputContent}
           />
           {errors[name] && (
-            <HelperText type="error" visible={!!errors[name]} style={{ fontWeight: 'bold' }}>
+            <HelperText type="error" visible={!!errors[name]} style={{ fontWeight: 'bold', fontFamily: 'monospace', }}>
               {errors[name]?.message as string}
             </HelperText>
           )}
@@ -111,7 +111,7 @@ export function ControlledPasswordInput({ control, name, placeholder, errors }: 
             contentStyle={formS.inputContent}
           />
           {errors[name] && (
-            <HelperText type="error" visible={!!errors[name]} style={{ fontWeight: 'bold' }}>
+            <HelperText type="error" visible={!!errors[name]} style={{ fontWeight: 'bold', fontFamily: 'monospace', }}>
               {errors[name]?.message as string}
             </HelperText>
           )}
