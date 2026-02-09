@@ -9,6 +9,10 @@ import { formStyles } from "../../../../styles/form.styles";
 import { idStyles } from "../../../../styles/id.styles";
 import { CustomHeader } from "../../../../components/HeaderApp";
 import { useClienteDetalle, useClienteAlquileres, useDeleteClienteAccion } from "../../../../hooks/useClientes";
+import * as ImagePicker from "expo-image-picker";
+import { Avatar, IconButton } from "react-native-paper";
+import { uploadClienteAvatar } from "../../../../services/clienteService";
+
 
 export default function ClienteDetalle() {
   const theme = useTheme();
@@ -23,6 +27,37 @@ export default function ClienteDetalle() {
   const { data: alquileres = [], isLoading: loadingAlquileres, refetch: refetchAlquileres } = useClienteAlquileres(idNum);
   const { ejecutarEliminar } = useDeleteClienteAccion(); 
   const [borrando, setBorrando] = useState(false);
+  const [subiendoImagen, setSubiendoImagen] = useState(false);
+
+  const handlePickImage = async () => {
+    // Pedir permisos
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Se necesitan permisos para acceder a la galería');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled && result.assets[0].uri) {
+      try {
+        setSubiendoImagen(true);
+        // Llama al servicio 
+        await uploadClienteAvatar(idNum, result.assets[0].uri);
+        // Recarga los datos
+        refetchCliente(); 
+      } catch (e) {
+        alert("Error al subir imagen: " + e.message);
+      } finally {
+        setSubiendoImagen(false);
+      }
+    }
+  };
 
   const abrirMapa = () => {
     // Comprueba que el cliente tenga dirección
@@ -82,30 +117,55 @@ export default function ClienteDetalle() {
       <ScrollView style={commonS.screen} contentContainerStyle={{ paddingBottom: 40 }}>
         
         {/* HEADER */}
-        <CustomHeader title={cliente.nombre}></CustomHeader>
-        <View style={idS.header}>
-          <View style={idS.avatar}>
-            <Text style={idS.avatarText}>
-              {cliente.nombre.charAt(0).toUpperCase()}
-            </Text>
+        <CustomHeader title={cliente.nombre} />
+
+        <View style={[idS.header, { alignItems: 'center', marginTop: 20 }]}>
+          <View style={{ position: 'relative' }}> 
+            {/* CONTENEDOR DEL BORDE */}
+            <View style={{
+              borderRadius: 100,
+              padding: 3,
+              backgroundColor: theme.colors.primary,
+            }}>
+              {subiendoImagen ? (
+                <View style={{ width: 80, height: 80, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.surfaceVariant, borderRadius: 40 }}>
+                </View>
+              ) : cliente.avatar_url ? (
+                <Avatar.Image 
+                  size={80} 
+                  source={{ uri: `${cliente.avatar_url}?t=${new Date().getTime()}` }} 
+                  style={{ backgroundColor: 'transparent' }} 
+                />
+              ) : (
+                <Avatar.Text 
+                  size={80} 
+                  label={cliente.nombre.substring(0, 2).toUpperCase()} 
+                  labelStyle={{ fontFamily: 'monospace' }}
+                />
+              )}
+            </View>
+            
+            {/* BOTÓN CÁMARA */}
+            <IconButton 
+              icon="camera" 
+              mode="contained" 
+              size={20}
+              containerColor={theme.colors.secondary} 
+              iconColor={theme.colors.surface}
+              onPress={handlePickImage}
+              style={{ 
+                position: 'absolute', 
+                bottom: -5, // Ajustado para que sobresalga un poco
+                right: -5, 
+                margin: 0, 
+                borderWidth: 2, 
+                borderColor: theme.colors.surface,
+                zIndex: 10
+              }}
+            />
           </View>
 
-          <Text style={idS.headerName}>{cliente.nombre}</Text>
-
-          <View
-            style={[
-              idS.statusBadge,
-              {
-                backgroundColor: cliente.activo
-                  ? theme.colors.onError
-                  : theme.colors.error,
-              },
-            ]}
-          >
-            <Text style={idS.statusBadgeText}>
-              {cliente.activo ? "ACTIVO" : "INACTIVO"}
-            </Text>
-          </View>
+          <Text style={[idS.headerName, { marginTop: 10 }]}>{cliente.nombre}</Text>
         </View>
 
         {/* INFO */}

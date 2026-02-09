@@ -125,6 +125,36 @@ export const updateCliente = async (payload: Cliente): Promise<Cliente | undefin
     return getClienteById(payload.id);
 };
 
+export const uploadClienteAvatar = async (clienteId: number, fileUri: string) => {
+    const ext = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
+    const fileName = `client-${clienteId}-${Date.now()}.${ext}`;
+
+    const response = await fetch(fileUri);
+    const blob = await response.blob();
+
+    // Subir al bucket 'avatars'
+    const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, blob);
+
+    if (uploadError) throw uploadError;
+
+    // Obtener URL
+    const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+    // Actualizar la tabla clientes
+    const { error: updateError } = await supabase
+        .from("clientes")
+        .update({ avatar_url: publicUrl })
+        .eq("id", clienteId);
+
+    if (updateError) throw updateError;
+    
+    return publicUrl;
+};
+
 
 // Eliminar cliente
 export const deleteCliente = async (id: number): Promise<boolean> => {
