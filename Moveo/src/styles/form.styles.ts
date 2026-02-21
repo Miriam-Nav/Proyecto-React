@@ -42,7 +42,7 @@ export const formStyles = (theme) => StyleSheet.create({
   btnPrimary: {
     flex: 1,
     backgroundColor: theme.colors.primary,
-    paddingVertical: 18,
+    paddingVertical: 12,
     borderRadius: 12,
     marginHorizontal: 6,
     alignItems: "center",
@@ -53,7 +53,7 @@ export const formStyles = (theme) => StyleSheet.create({
   btnSecondary: {
     flex: 1,
     backgroundColor: theme.colors.surface,
-    paddingVertical: 18,
+    paddingVertical: 12,
     borderRadius: 12,
     marginHorizontal: 6,
     alignItems: "center",
@@ -65,7 +65,7 @@ export const formStyles = (theme) => StyleSheet.create({
     color: theme.colors.onPrimary,
     fontWeight: "bold",
     fontFamily: "monospace",
-    fontSize: 16,
+    fontSize: 13,
     textAlign: "center"
   },
 });

@@ -5,7 +5,17 @@ import { focusManager, QueryClient, QueryClientProvider } from "@tanstack/react-
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            staleTime: 30_000,
+            // Tiempo que los datos se consideran frescos
+            staleTime: 10_000,
+            // Siempre refetch al montar el componente
+            refetchOnMount: 'always',
+            // Refetch al recuperar el foco de la ventana
+            refetchOnWindowFocus: true,
+            // Reintentar 3 veces con delays más cortos
+            retry: 3,
+            retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 5000),
+            // Cache de 5 minutos
+            gcTime: 5 * 60 * 1000,
         },
     },
 });

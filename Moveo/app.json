@@ -20,7 +20,9 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       }
     },
     "android": {
@@ -50,7 +52,8 @@
           "color": "#ffffff",
           "sounds": []
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ]
   }
 }

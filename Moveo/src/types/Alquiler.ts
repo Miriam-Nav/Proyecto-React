@@ -7,8 +7,11 @@ export interface Alquiler {
     videojuego_id: number;
     fecha_inicio: string;
     fecha_fin_prevista: string;
+    fecha_fin_real?: string;
     estado: string;
     total_pagado: number;
+    created_at?: string;
+    updated_at?: string;
     videojuego?: Videojuego;
     cliente?: Cliente;
 }

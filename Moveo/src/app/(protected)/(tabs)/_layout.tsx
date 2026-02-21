@@ -51,6 +51,19 @@ export default function TabsLayout() {
           )
         }} 
       />
+      <Tabs.Screen 
+        name="alquileres" 
+        options={{ 
+          title: "Alquileres",
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons 
+              name={focused ? "package-variant" : "package-variant-closed"} 
+              size={26} 
+              color={color} 
+            />
+          )
+        }} 
+      />
     </Tabs>
   );
 }

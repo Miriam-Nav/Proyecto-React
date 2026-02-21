@@ -9,6 +9,10 @@ export function useClientes() {
   return useQuery({
     queryKey: ['clientes'], 
     queryFn: getClientes,
+    // Forzar refetch en mount para asegurar datos frescos
+    refetchOnMount: 'always',
+    // Reintentar en caso de error inicial
+    retry: 3,
   });
 }
 
@@ -18,6 +22,8 @@ export function useClienteDetalle(id: number) {
     queryKey: ['cliente', id],
     queryFn: () => getClienteById(id),
     enabled: !!id,
+    refetchOnMount: 'always',
+    retry: 3,
   });
 }
 
@@ -27,6 +33,8 @@ export function useClienteAlquileres(id: number) {
     queryKey: ['alquileres', id],
     queryFn: () => getAlquileresByCliente(id),
     enabled: !!id,
+    refetchOnMount: 'always',
+    retry: 3,
   });
 }
 
