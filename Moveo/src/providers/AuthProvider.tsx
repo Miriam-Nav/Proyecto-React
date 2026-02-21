@@ -3,6 +3,7 @@ import { createContext, PropsWithChildren, useEffect, useMemo, useState } from "
 import { useUserStore } from "../stores/user.store";
 import { supabase } from "../config/supabaseClient";
 import { fetchProfileByAuthId } from "../services/authService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Evita que la pantalla de carga se quite antes de tiempo
 SplashScreen.preventAutoHideAsync();
@@ -59,24 +60,76 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
         // Carga inicial de la sesión al abrir la App
         const initializeAuth = async () => {
-            const { data } = await supabase.auth.getSession();
-            
-            if (data?.session) {
-                await syncProfile(data.session);
-            } else {
+            try {
+                const { data, error } = await supabase.auth.getSession();
+                
+                // Si hay error de token inválido, limpiar completamente el almacenamiento
+                if (error) {
+                    // Detectar error específico de refresh token
+                    const isRefreshTokenError = error.message?.includes('Refresh Token');
+                    
+                    if (isRefreshTokenError) {
+                        console.log("🧹 Limpiando sesión corrupta...");
+                        // Limpiar AsyncStorage de Supabase
+                        try {
+                            const keys = await AsyncStorage.getAllKeys();
+                            const supabaseKeys = keys.filter(key => 
+                                key.includes('supabase') || key.includes('auth')
+                            );
+                            if (supabaseKeys.length > 0) {
+                                await AsyncStorage.multiRemove(supabaseKeys);
+                            }
+                        } catch (storageError) {
+                            console.warn("Error limpiando storage:", storageError);
+                        }
+                    } else {
+                        console.warn("Error obteniendo sesión:", error.message);
+                    }
+                    
+                    try {
+                        await supabase.auth.signOut();
+                    } catch (signOutError) {
+                        // Ignorar error al cerrar sesión inexistente
+                    }
+                    clearUser();
+                } else if (data?.session) {
+                    await syncProfile(data.session);
+                } else {
+                    clearUser();
+                }
+            } catch (error: any) {
+                // Solo mostrar error si NO es el error común de refresh token
+                if (!error?.message?.includes('Refresh Token')) {
+                    console.error("Error inicializando auth:", error);
+                }
+                
+                // Limpiar sesión corrupta silenciosamente
+                try {
+                    await supabase.auth.signOut();
+                } catch {
+                    // Ignorar
+                }
                 clearUser();
+            } finally {
+                // GARANTIZAR que siempre se marca como listo
+                if (isMounted) {
+                    setIsAuthReady(true);
+                }
             }
-
-            if (isMounted) setIsAuthReady(true);
         };
 
         initializeAuth();
 
         const { data: authListener } = supabase.auth.onAuthStateChange(
             async (event, session) => {
+                // Manejar tokens inválidos o sesión corrupta
                 if (event === "SIGNED_OUT" || !session) {
                     clearUser();
-                } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+                } else if (event === "TOKEN_REFRESHED" && session) {
+                    await syncProfile(session);
+                } else if (event === "SIGNED_IN" && session) {
+                    await syncProfile(session);
+                } else if (event === "USER_UPDATED" && session) {
                     await syncProfile(session);
                 }
             }
@@ -91,8 +144,22 @@ export function AuthProvider({ children }: PropsWithChildren) {
     // Ocultar SplashScreen cuando todo esté listo
     useEffect(() => {
         if (isAuthReady) {
-            SplashScreen.hideAsync();
+            SplashScreen.hideAsync().catch((error) => {
+                console.warn("Error ocultando splash:", error);
+            });
         }
+    }, [isAuthReady]);
+
+    // Timeout de seguridad: ocultar splash después de 5s máximo
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (!isAuthReady) {
+                console.warn("⚠️ Timeout: forzando ocultar splash screen");
+                setIsAuthReady(true);
+            }
+        }, 5000);
+
+        return () => clearTimeout(timeout);
     }, [isAuthReady]);
 
     // Lógica de Redirección 
