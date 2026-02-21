@@ -17,5 +17,5 @@ export async function pickImageFromLibrary() {
   if (result.canceled) return null
 
   // Devuelve la imagen seleccionada
-  return result.assets[0] // { uri, width, height, fileName, ... }
+  return result.assets[0]
 }

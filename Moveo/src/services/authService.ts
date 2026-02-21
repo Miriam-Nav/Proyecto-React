@@ -88,10 +88,11 @@ export const isEmailInUse = async (email: string, excludeId?: number): Promise<b
 
   const { data, error } = await query.maybeSingle();
 
-  // Si hay error de conexión devolvemos false (o manejamos según prefieras)
+  // Si hay error de conexión devuelve false
   if (error) return false; 
   
-  return !!data; // true si encontró a alguien, false si no
+  // true si encontró a alguien, false si no
+  return !!data; 
 };
 
 

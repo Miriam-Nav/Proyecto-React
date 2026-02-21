@@ -11,12 +11,14 @@ SplashScreen.preventAutoHideAsync();
 type AuthState = {
     isLoggedIn: boolean;
     isReady: boolean;
+    authUserId: string | null;
     logOut: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthState>({
     isLoggedIn: false,
     isReady: false,
+    authUserId: null,
     logOut: async () => { },
 });
 
@@ -30,6 +32,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
     // Estado para controlar la carga
     const [isAuthReady, setIsAuthReady] = useState(false);
     
+    // Estado para el ID de auth de Supabase (UUID)
+    const [authUserId, setAuthUserId] = useState<string | null>(null);
+    
     // Está logueado si tiene usuario y token
     const isLoggedIn = useMemo(() => Boolean(user && token), [user, token]);
 
@@ -40,8 +45,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
         const syncProfile = async (session: any) => {
             if (!session?.user?.id) {
                 clearUser();
+                setAuthUserId(null);
                 return;
             }
+
+            // Actualizar el authUserId (UUID de Supabase)
+            setAuthUserId(session.user.id);
 
             try {
                 // Busca datos en tabla 'users' 
@@ -53,6 +62,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
                 console.error("Error sincronizando perfil:", error);
                 if (isMounted) {
                     clearUser();
+                    setAuthUserId(null);
                     await supabase.auth.signOut();
                 }
             }
@@ -92,10 +102,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
                         // Ignorar error al cerrar sesión inexistente
                     }
                     clearUser();
+                    setAuthUserId(null);
                 } else if (data?.session) {
                     await syncProfile(data.session);
                 } else {
                     clearUser();
+                    setAuthUserId(null);
                 }
             } catch (error: any) {
                 // Solo mostrar error si NO es el error común de refresh token
@@ -110,8 +122,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
                     // Ignorar
                 }
                 clearUser();
+                setAuthUserId(null);
             } finally {
-                // GARANTIZAR que siempre se marca como listo
+                // Asegura que siempre se marca como listo
                 if (isMounted) {
                     setIsAuthReady(true);
                 }
@@ -125,6 +138,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
                 // Manejar tokens inválidos o sesión corrupta
                 if (event === "SIGNED_OUT" || !session) {
                     clearUser();
+                    setAuthUserId(null);
                 } else if (event === "TOKEN_REFRESHED" && session) {
                     await syncProfile(session);
                 } else if (event === "SIGNED_IN" && session) {
@@ -154,7 +168,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     useEffect(() => {
         const timeout = setTimeout(() => {
             if (!isAuthReady) {
-                console.warn("⚠️ Timeout: forzando ocultar splash screen");
+                console.warn("Timeout: forzando ocultar splash screen");
                 setIsAuthReady(true);
             }
         }, 5000);
@@ -180,10 +194,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
     const logOut = async () => {
         await supabase.auth.signOut();
         clearUser();
+        setAuthUserId(null);
     };
 
     return (
-        <AuthContext.Provider value={{ isReady: isAuthReady, isLoggedIn, logOut }}>
+        <AuthContext.Provider value={{ isReady: isAuthReady, isLoggedIn, authUserId, logOut }}>
             {children}
         </AuthContext.Provider>
     );

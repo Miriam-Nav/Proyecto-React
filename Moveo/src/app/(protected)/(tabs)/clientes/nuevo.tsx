@@ -1,5 +1,5 @@
 import { Text, useTheme } from "react-native-paper";
-import { View, ScrollView} from "react-native";
+import { View, ScrollView, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,13 +34,13 @@ export default function NuevoCliente() {
         activo: true,
         notas: ""
       });
+      Alert.alert("Éxito", `Cliente "${data.nombre}" creado correctamente`);
       router.back();
     } catch (error) {
       if (error.message.includes("registrado") || error.message.includes("email")) {
         setError("email", { type: "manual", message: error.message });
       } else {
-        // Si es otro tipo de error
-        alert("Error: " + error.message);
+        Alert.alert("Error", error.message);
       }
       console.log("Error: " + error.message);
     } finally {

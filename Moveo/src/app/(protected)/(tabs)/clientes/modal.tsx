@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Alert } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useTheme } from "react-native-paper";
 import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
@@ -22,8 +22,11 @@ export default function ClienteModal() {
     try {
       setCargando(true);
       await ejecutarCambioEstado(Number(id), nuevoEstado);
+      const estadoTexto = nuevoEstado ? "ACTIVO" : "INACTIVO";
+      Alert.alert("Éxito", `Cliente "${nombre}" marcado como ${estadoTexto}`);
       router.back();
     } catch (error) {
+      Alert.alert("Error", "No se pudo cambiar el estado del cliente");
       console.log(error)
     } finally {
       setCargando(false);

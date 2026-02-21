@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { View, Text, ActivityIndicator, ScrollView, Linking, Platform } from "react-native";
+import { View, Text, ActivityIndicator, ScrollView, Linking, Platform, Alert } from "react-native";
 import { useLocalSearchParams, Stack, useFocusEffect, router } from "expo-router";
 import { useTheme } from "react-native-paper";
 import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
@@ -33,7 +33,7 @@ export default function ClienteDetalle() {
     // Pedir permisos
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      alert('Se necesitan permisos para acceder a la galería');
+      Alert.alert('Permisos', 'Se necesitan permisos para acceder a la galería');
       return;
     }
 
@@ -52,7 +52,7 @@ export default function ClienteDetalle() {
         // Recarga los datos
         refetchCliente(); 
       } catch (e) {
-        alert("Error al subir imagen: " + e.message);
+        Alert.alert("Error", "Error al subir imagen: " + e.message);
       } finally {
         setSubiendoImagen(false);
       }
@@ -62,7 +62,7 @@ export default function ClienteDetalle() {
   const abrirMapa = () => {
     // Comprueba que el cliente tenga dirección
     if (!cliente?.direccion) {
-      alert("Este cliente no tiene una dirección registrada.");
+      Alert.alert("Sin dirección", "Este cliente no tiene una dirección registrada.");
       return;
     }
 
@@ -155,7 +155,7 @@ export default function ClienteDetalle() {
               onPress={handlePickImage}
               style={{ 
                 position: 'absolute', 
-                bottom: -5, // Ajustado para que sobresalga un poco
+                bottom: -5,
                 right: -5, 
                 margin: 0, 
                 borderWidth: 2, 
@@ -222,20 +222,30 @@ export default function ClienteDetalle() {
           {/* ELIMINAR */}
           <PrimaryButton 
             onPress={async () => {
-              const confirmado = confirm("¿Seguro que quieres eliminar este cliente?");
-              
-              if (confirmado) {
-                try {
-                  setBorrando(true);
-                  await ejecutarEliminar(idNum);
-                  router.back();
-                } catch (e) {
-                  const mensaje = e instanceof Error ? e.message : "No se pudo eliminar";
-                  alert(mensaje); 
-                } finally {
-                  setBorrando(false);
-                }
-              }
+              Alert.alert(
+                "Confirmar eliminación",
+                `¿Seguro que quieres eliminar a "${cliente?.nombre}"?`,
+                [
+                  { text: "Cancelar", style: "cancel" },
+                  {
+                    text: "Eliminar",
+                    style: "destructive",
+                    onPress: async () => {
+                      try {
+                        setBorrando(true);
+                        await ejecutarEliminar(idNum);
+                        Alert.alert("Éxito", `Cliente "${cliente?.nombre}" eliminado correctamente`);
+                        router.back();
+                      } catch (e) {
+                        const mensaje = e instanceof Error ? e.message : "No se pudo eliminar";
+                        Alert.alert("Error", mensaje);
+                      } finally {
+                        setBorrando(false);
+                      }
+                    }
+                  }
+                ]
+              );
             }} 
             text={borrando ? "Eliminando..." : "Eliminar Cliente"}
             color={theme.colors.error}

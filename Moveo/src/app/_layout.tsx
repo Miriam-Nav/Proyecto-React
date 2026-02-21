@@ -1,14 +1,18 @@
 import { Stack } from "expo-router";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { ThemeProvider } from "../providers/ThemeProvider"; 
-import { AuthProvider } from "../providers/AuthProvider"; 
+import { AuthProvider, AuthContext } from "../providers/AuthProvider"; 
 import { QueryProvider } from "../providers/QueryProvider";
-import { useNotifications } from "../hooks/useNotifications";
-import { useEffect } from "react";
+import { usePushNotifications } from "../hooks/useNotifications";
+import { useContext } from "react";
 
 function NotificationsInitializer() {
-  // Inicializar notificaciones después de que los providers estén listos
-  useNotifications();
+  // Obtener el authUserId del contexto
+  const { authUserId } = useContext(AuthContext);
+  
+  // Inicializar notificaciones con el userId de Supabase
+  usePushNotifications({ userId: authUserId });
+  
   return null;
 }
 

@@ -76,10 +76,10 @@ export async function registerForPushNotifications() {
       projectId,
     });
 
-    console.log('✅ Expo Push Token:', tokenData.data);
+    console.log('Expo Push Token:', tokenData.data);
     return tokenData.data;
   } catch (error) {
-    console.error('❌ Error al registrar notificaciones:', error);
+    console.error('Error al registrar notificaciones:', error);
     return null;
   }
 }
@@ -95,7 +95,7 @@ export async function showLocalNotification(title: string, body: string, data?: 
       data,
       sound: true,
     },
-    trigger: null, // null = mostrar inmediatamente
+    trigger: null,
   });
 }
 

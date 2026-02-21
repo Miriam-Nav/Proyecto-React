@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { ActivityIndicator, Text, useTheme } from "react-native-paper";
-import { View, ScrollView} from "react-native";
+import { View, ScrollView, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,6 +50,7 @@ export default function EditarCliente() {
         direccion: data.direccion
       });
 
+      Alert.alert("Éxito", `Cliente "${data.nombre}" actualizado correctamente`);
       router.back();
     } catch (error) {
 
@@ -57,7 +58,7 @@ export default function EditarCliente() {
         setError("email", { type: "manual", message: error.message });
       } else {
         // Si es otro tipo de error
-        alert("Error: " + error.message);
+        Alert.alert("Error", error.message);
       }
       
       console.log("Error. No se pudo actualizar", error)

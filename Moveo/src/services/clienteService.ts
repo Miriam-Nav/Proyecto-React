@@ -45,7 +45,9 @@ export const checkEmailDuplicado = async (email: string, excludeId?: number): Pr
     const { data, error } = await query.maybeSingle();
     
     if (error) return false;
-    return !!data; // Retorna true si encontró a alguien
+    
+    // Retorna true si encontró a alguien
+    return !!data; 
 };
 
 // Obtener lista de clientes
@@ -92,7 +94,14 @@ export const createCliente = async (payload: Omit<Cliente, "id" | "created_at">)
         .select()
         .single();
 
-    if (error || !data) throw new Error("No se pudo crear el cliente.");
+    if (error) {
+        console.error("Error detallado al crear cliente:", error);
+        throw new Error(`Error al crear cliente: ${error.message || error.details || 'Desconocido'}`);
+    }
+    
+    if (!data) {
+        throw new Error("No se recibieron datos del cliente creado.");
+    }
 
     return mapCliente(data);
 };
