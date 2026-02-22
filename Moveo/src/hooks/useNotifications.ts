@@ -29,7 +29,6 @@ export function usePushNotifications(options: UsePushNotificationsOptions = {}) 
   const { userId } = options;
   const [pushToken, setPushToken] = useState<string | null>(null);
   const [registering, setRegistering] = useState(false);
-  const [sending, setSending] = useState(false);
   const [lastNotification, setLastNotification] = useState<string | null>(null);
 
   const projectId = useMemo(() => {
@@ -80,10 +79,6 @@ export function usePushNotifications(options: UsePushNotificationsOptions = {}) 
     setRegistering(true);
     try {
       if (Platform.OS === 'web') {
-        return;
-      }
-      if (!Device.isDevice) {
-        Alert.alert('Dispositivo fisico requerido', 'Las notificaciones push no funcionan en simulador.');
         return;
       }
 
@@ -144,12 +139,7 @@ export function usePushNotifications(options: UsePushNotificationsOptions = {}) 
 
   // Envía una notificación push a todos los tokens excepto `excludeToken`.
   const sendNotification = async (message: string, excludeToken?: string | null) => {
-    if (!message.trim()) {
-      Alert.alert('Falta mensaje', 'Escribe el texto de la notificacion.');
-      return false;
-    }
 
-    setSending(true);
     try {
       const { data, error } = await supabase.from('push_tokens').select('token');
       if (error) {
@@ -167,29 +157,21 @@ export function usePushNotifications(options: UsePushNotificationsOptions = {}) 
         return false;
       }
 
-      // Expo recomienda enviar en lotes
-      const chunks = chunkArray(tokens, 80);
-      for (const chunk of chunks) {
-        const messages = chunk.map((token) => ({
-          to: token,
-          title: 'Notificacion',
-          body: message.trim(),
-        }));
+      const messages = tokens.map((token) => ({
+        to: token,
+        title: 'Notificacion',
+        body: message.trim(),
+      }));
 
-        const response = await fetch(EXPO_PUSH_API_URL, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(messages),
-        });
+      await fetch(EXPO_PUSH_API_URL, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(messages),
+      });
 
-        if (!response.ok) {
-          const errorBody = await response.text();
-          throw new Error(errorBody || 'Error enviando notificaciones');
-        }
-      }
 
       Alert.alert('Enviado', 'La notificacion se ha enviado.');
       return true;
@@ -197,24 +179,13 @@ export function usePushNotifications(options: UsePushNotificationsOptions = {}) 
       console.error('Error enviando notificación:', error);
       Alert.alert('Error', error instanceof Error ? error.message : 'No se pudo enviar');
       return false;
-    } finally {
-      setSending(false);
     }
   };
 
   return {
     pushToken,
     registering,
-    sending,
     lastNotification,
     sendNotification,
   };
-}
-
-function chunkArray<T>(items: T[], size: number) {
-  const chunks: T[][] = [];
-  for (let i = 0; i < items.length; i += size) {
-    chunks.push(items.slice(i, i + size));
-  }
-  return chunks;
 }

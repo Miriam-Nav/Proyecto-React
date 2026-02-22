@@ -20,37 +20,69 @@ const noopStorage: StateStorage = {
 };
 
 const webStorage: StateStorage = {
-    getItem: async (name) =>
-        typeof window === "undefined" ? null : window.localStorage.getItem(name),
+    getItem: async (name) => {
+        try {
+            if (Platform.OS === 'web' && globalThis.localStorage) {
+                return globalThis.localStorage.getItem(name);
+            }
+            return null;
+        } catch (error) {
+            console.error('Error al leer de localStorage:', error);
+            return null;
+        }
+    },
     setItem: async (name, value) => {
-        if (typeof window === "undefined") return;
-        window.localStorage.setItem(name, value);
+        try {
+            if (Platform.OS === 'web' && globalThis.localStorage) {
+                globalThis.localStorage.setItem(name, value);
+            }
+        } catch (error) {
+            console.error('Error al guardar en localStorage:', error);
+        }
     },
     removeItem: async (name) => {
-        if (typeof window === "undefined") return;
-        window.localStorage.removeItem(name);
+        try {
+            if (Platform.OS === 'web' && globalThis.localStorage) {
+                globalThis.localStorage.removeItem(name);
+            }
+        } catch (error) {
+            console.error('Error al eliminar de localStorage:', error);
+        }
     },
 };
 
 const nativeSecureStorage: StateStorage = {
     getItem: async (name) => {
-        const SecureStore = require("expo-secure-store") as typeof import("expo-secure-store");
-        const value = await SecureStore.getItemAsync(name);
-        return value ?? null;
+        try {
+            const SecureStore = require("expo-secure-store") as typeof import("expo-secure-store");
+            const value = await SecureStore.getItemAsync(name);
+            return value ?? null;
+        } catch (error) {
+            console.error('Error al leer de SecureStore:', error);
+            return null;
+        }
     },
     setItem: async (name, value) => {
-        const SecureStore = require("expo-secure-store") as typeof import("expo-secure-store");
-        await SecureStore.setItemAsync(name, value);
+        try {
+            const SecureStore = require("expo-secure-store") as typeof import("expo-secure-store");
+            await SecureStore.setItemAsync(name, value);
+        } catch (error) {
+            console.error('Error al guardar en SecureStore:', error);
+        }
     },
     removeItem: async (name) => {
-        const SecureStore = require("expo-secure-store") as typeof import("expo-secure-store");
-        await SecureStore.deleteItemAsync(name);
+        try {
+            const SecureStore = require("expo-secure-store") as typeof import("expo-secure-store");
+            await SecureStore.deleteItemAsync(name);
+        } catch (error) {
+            console.error('Error al eliminar de SecureStore:', error);
+        }
     },
 };
 
 const storage = createJSONStorage(() => {
     if (Platform.OS === "web") {
-        return typeof window !== "undefined" ? webStorage : noopStorage;
+        return webStorage;
     }
     return nativeSecureStorage;
 });

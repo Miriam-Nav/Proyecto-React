@@ -50,7 +50,7 @@ export default function EditarCliente() {
         direccion: data.direccion
       });
 
-      Alert.alert("Éxito", `Cliente "${data.nombre}" actualizado correctamente`);
+      Alert.alert("Bien", `Cliente "${data.nombre}" actualizado correctamente`);
       router.back();
     } catch (error) {
 

@@ -81,7 +81,7 @@ export default function ProfileScreen() {
     // Pedir permisos 
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Error", "Necesitamos permiso para acceder a la galería");
+      Alert.alert("Error", "Se necesita permiso para acceder a la galería");
       return;
     }
 
@@ -97,16 +97,32 @@ export default function ProfileScreen() {
     try {
       setIsUploadingAvatar(true);
       
+      console.log("Iniciando subida de avatar");
+      console.log("URI del archivo:", result.assets[0].uri);
+      
       const updatedUser = await uploadUserAvatar({
         userId: user.id,
         fileUri: result.assets[0].uri,
       });
 
+      console.log("Avatar subido exitosamente");
+      
       // Actualiza Zustand
       setUser(updatedUser, role!, token!);
+      
+      Alert.alert("Bien", "Foto de perfil actualizada");
 
-    } catch (error) {
-      Alert.alert("Error", "No se pudo actualizar la foto");
+    } catch (error: any) {
+      console.error("ERROR AL SUBIR AVATAR:", error);
+      
+      // Log detallado del error
+      if (error.message) console.log("Mensaje:", error.message);
+      if (error.statusCode) console.log("Código de estado:", error.statusCode);
+      if (error.error) console.log("Error interno:", error.error);
+      
+      const errorMessage = error.message || error.error || 'Error desconocido al subir la imagen';
+      Alert.alert("Error", `No se pudo actualizar la foto: ${errorMessage}`);
+      
     } finally {
       setIsUploadingAvatar(false);
     }

@@ -1,21 +1,37 @@
-import * as ImagePicker from 'expo-image-picker'
+import * as ImagePicker from "expo-image-picker";
 
 export async function pickImageFromLibrary() {
-  // Solicita permiso para acceder a la galería
-  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-  if (status !== 'granted') {
-    throw new Error('Permiso de galería denegado')
+  // Permisos
+  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (status !== "granted") {
+    throw new Error("Permiso de galería denegado");
   }
 
-  // Abre el selector de imágenes del sistema
+  // Abrir galería
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    quality: 0.8,
-  })
+    // El editor de Expo fuerza la recompresión de la imagen
+    allowsEditing: true, 
+    aspect: [1, 1], 
+    // Baja ligeramente la calidad (de 1.0 a 0.8)
+    quality: 0.8, 
+  });
 
-  // El usuario puede cancelar la selección
-  if (result.canceled) return null
+  // Cancelado
+  if (result.canceled) return null;
 
-  // Devuelve la imagen seleccionada
-  return result.assets[0]
+  const asset = result.assets[0];
+
+  // Normalizar el formato
+  // Fuerza el tipo 'image/jpeg' aunque el original sea otra cosa. 
+  // Esto es lo que se usará luego en el FormData para que Supabase lo acepte bien.
+  return {
+    uri: asset.uri,
+    width: asset.width,
+    height: asset.height,
+    // Fuerza siempre JPEG aquí
+    type: "image/jpeg",  
+    // Asegura que el nombre termine en .jpg
+    fileName: asset.fileName || `upload_${Date.now()}.jpg`, 
+  };
 }

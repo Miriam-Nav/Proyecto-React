@@ -34,7 +34,7 @@ export default function NuevoCliente() {
         activo: true,
         notas: ""
       });
-      Alert.alert("Éxito", `Cliente "${data.nombre}" creado correctamente`);
+      Alert.alert("Bien", `Cliente "${data.nombre}" creado correctamente`);
       router.back();
     } catch (error) {
       if (error.message.includes("registrado") || error.message.includes("email")) {
@@ -47,6 +47,7 @@ export default function NuevoCliente() {
       setCargando(false);
     }
   };
+
   return (
     <ScrollView contentContainerStyle={[commonS.screen, {padding: 20, justifyContent: "center"}]}>
       <View style={[formS.container]}>

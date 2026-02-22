@@ -23,7 +23,7 @@ export default function ClienteModal() {
       setCargando(true);
       await ejecutarCambioEstado(Number(id), nuevoEstado);
       const estadoTexto = nuevoEstado ? "ACTIVO" : "INACTIVO";
-      Alert.alert("Éxito", `Cliente "${nombre}" marcado como ${estadoTexto}`);
+      Alert.alert("Bien", `Cliente "${nombre}" marcado como ${estadoTexto}`);
       router.back();
     } catch (error) {
       Alert.alert("Error", "No se pudo cambiar el estado del cliente");

@@ -41,6 +41,109 @@ export function InfoCard({ label, value, icon, onIconPress }: Props) {
   );
 }
 
+type PropsAlquiler = {
+  tituloVideojuego: string;
+  nombreCliente: string;
+  fechaInicio: string;
+  fechaFin: string;
+  estado: string;
+  monto?: number;
+};
+
+export function InfoCardAlquiler({ 
+  tituloVideojuego, 
+  nombreCliente, 
+  fechaInicio, 
+  fechaFin, 
+  estado,
+  monto 
+}: PropsAlquiler) {
+  const theme = useTheme();
+  const idS = idStyles(theme);
+
+  // Función para determinar el color del badge según el estado
+  const getEstadoColor = (est: string) => {
+    switch (est.toLowerCase()) {
+      case 'activo': return theme.colors.primary;
+      case 'finalizado': return theme.colors.tertiary;
+      case 'retrasado': return theme.colors.error;
+      default: return theme.colors.outline;
+    }
+  };
+  
+  return (
+    <View style={[
+      idS.infoCard, 
+      { 
+        borderWidth: 2, 
+        borderColor: theme.colors.outlineVariant, 
+        marginBottom: 12 
+      }
+    ]}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: 'flex-start' }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ 
+            fontFamily: "monospace", 
+            fontWeight: "bold", 
+            fontSize: 14, 
+            color: theme.colors.onSurface 
+          }}>
+            {tituloVideojuego}
+          </Text>
+          
+          <Text style={{ 
+            fontFamily: "monospace", 
+            fontSize: 12, 
+            color: theme.colors.onSurfaceVariant,
+            marginTop: 2
+          }}>
+            Cliente: {nombreCliente}
+          </Text>
+          
+          <Text style={{ 
+            fontFamily: "monospace", 
+            fontSize: 11, 
+            color: theme.colors.onSurfaceVariant,
+            marginTop: 2
+          }}>
+            {fechaInicio} - {fechaFin}
+          </Text>
+
+          {monto !== undefined && (
+            <Text style={{ 
+              fontFamily: "monospace", 
+              fontSize: 13, 
+              fontWeight: 'bold', 
+              color: theme.colors.primary,
+              marginTop: 6
+            }}>
+              ${monto.toFixed(2)}
+            </Text>
+          )}
+        </View>
+
+        {/* Badge de Estado */}
+        <View style={{
+          paddingVertical: 4,
+          paddingHorizontal: 10,
+          borderRadius: 8,
+          backgroundColor: getEstadoColor(estado),
+          marginLeft: 8,
+        }}>
+          <Text style={{
+            color: theme.colors.surface,
+            fontWeight: 'bold',
+            fontSize: 10,
+            fontFamily: 'monospace',
+          }}>
+            {estado.toUpperCase()}
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 
 type PropsPedidos = {
   codigo: string;

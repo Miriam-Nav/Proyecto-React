@@ -15,7 +15,7 @@ export default function ClientesScreen() {
   const { 
     data: clientes = [], 
     isLoading, 
-    isError, 
+    error, 
     refetch 
   } = useClientes();
 
@@ -43,7 +43,7 @@ export default function ClientesScreen() {
     );
   }
 
-  if (isError) {
+  if (error) {
     return (
       <View style={commonS.center}>
         <Text>Error al conectar con el servidor.</Text>

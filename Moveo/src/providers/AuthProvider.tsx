@@ -79,7 +79,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
                     const isRefreshTokenError = error.message?.includes('Refresh Token');
                     
                     if (isRefreshTokenError) {
-                        console.log("🧹 Limpiando sesión corrupta...");
+                        console.log("Limpiando sesión corrupta...");
                         // Limpiar AsyncStorage de Supabase
                         try {
                             const keys = await AsyncStorage.getAllKeys();

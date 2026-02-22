@@ -1,71 +1,56 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import { View, FlatList, TouchableOpacity } from "react-native";
-import { useTheme, TextInput as PaperInput } from "react-native-paper";
+import { useTheme, TextInput as PaperInput, Text } from "react-native-paper";
 
-// Hook 
-
-export function useSearchDropdown<T extends { id: number }>(getLabel: (item: T) => string) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-
-  const select = useCallback((item: T) => {
-    setSelectedId(item.id);
-    setQuery(getLabel(item));
-    setOpen(false);
-  }, [getLabel]);
-
-  const clear = useCallback(() => {
-    setSelectedId(null);
-    setQuery("");
-  }, []);
-
-  return { selectedId, query, setQuery, open, setOpen, select, clear };
-}
-
-// Componente 
-
-interface SearchDropdownProps<T> {
+interface Props<T> {
   label: string;
-  value: string;
-  onChangeText: (text: string) => void;
-  onFocus: () => void;
-  dropdownVisible: boolean;
+  value: number | null;                
+  onChange: (id: number) => void;      
   items: T[];
+  getLabel: (item: T) => string;       
   keyExtractor: (item: T) => string;
-  renderItem: (item: T) => React.ReactNode;
-  onSelectItem: (item: T) => void;
+  renderItem?: (item: T) => React.ReactNode;
   zIndex?: number;
 }
 
-export function SearchDropdown<T>({
+export function SearchDropdown<T extends { id: number }>({
   label,
   value,
-  onChangeText,
-  onFocus,
-  dropdownVisible,
+  onChange,
   items,
+  getLabel,
   keyExtractor,
   renderItem,
-  onSelectItem,
   zIndex = 1,
-}: SearchDropdownProps<T>) {
+}: Props<T>) {
   const theme = useTheme();
+
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+
+  const selectedItem = items.find((i) => i.id === value);
+
+  const filtered = items.filter((i) =>
+    getLabel(i).toLowerCase().includes(query.toLowerCase())
+  );
 
   return (
     <View style={{ marginBottom: 20, position: "relative", zIndex }}>
       <PaperInput
         label={label}
-        value={value}
-        onChangeText={onChangeText}
-        onFocus={onFocus}
+        value={selectedItem ? getLabel(selectedItem) : query}
+        onChangeText={(text) => {
+          setQuery(text);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
         mode="outlined"
-        style={{ fontFamily: "monospace", fontSize: 13 }}
         right={
-          <PaperInput.Icon icon={dropdownVisible ? "chevron-up" : "chevron-down"} />
+          <PaperInput.Icon icon={open ? "chevron-up" : "chevron-down"} />
         }
       />
-      {dropdownVisible && items.length > 0 && (
+
+      {open && filtered.length > 0 && (
         <View
           style={{
             position: "absolute",
@@ -78,35 +63,32 @@ export function SearchDropdown<T>({
             borderWidth: 1,
             borderColor: theme.colors.outlineVariant,
             elevation: 5,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            zIndex: 9999,
             overflow: "hidden",
+            zIndex: 9999,
           }}
         >
           <FlatList
-            data={items}
+            data={filtered}
             keyExtractor={keyExtractor}
-            style={{
-              maxHeight: 220,
-              backgroundColor: theme.colors.surface,
-            }}
-            scrollEnabled={true}
             keyboardShouldPersistTaps="handled"
-            removeClippedSubviews={false}
             renderItem={({ item }) => (
               <TouchableOpacity
-                onPress={() => onSelectItem(item)}
+                onPress={() => {
+                  onChange(item.id);      
+                  setQuery(getLabel(item));
+                  setOpen(false);
+                }}
                 style={{
                   padding: 12,
                   borderBottomWidth: 1,
                   borderBottomColor: theme.colors.surfaceVariant,
-                  backgroundColor: theme.colors.surface,
                 }}
               >
-                {renderItem(item)}
+                {renderItem ? (
+                  renderItem(item)
+                ) : (
+                  <Text>{getLabel(item)}</Text>
+                )}
               </TouchableOpacity>
             )}
           />

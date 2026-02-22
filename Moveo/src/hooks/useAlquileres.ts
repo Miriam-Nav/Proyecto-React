@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { supabase } from "../config/supabaseClient";
@@ -7,14 +7,11 @@ import {
     alquileresQueryKey,
     getAllAlquileres,
     createAlquiler,
-    updateAlquilerEstado,
-    deleteAlquiler,
 } from "../services/alquilerService";
 
 // Hook principal con Realtime
 export function useAlquileresRealtime() {
     const queryClient = useQueryClient();
-    const [realtimeStatus, setRealtimeStatus] = useState<'CONNECTING' | 'CONNECTED' | 'DISCONNECTED'>('CONNECTING');
 
     // Query principal
     const { data: alquileres = [], isLoading, error, refetch } = useQuery({
@@ -52,7 +49,6 @@ export function useAlquileresRealtime() {
 
     // Suscripción al canal de Realtime
     useEffect(() => {
-        setRealtimeStatus('CONNECTING');
 
         const applyRealtimeChange = (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
             console.log('Realtime event received:', payload.eventType, payload);
@@ -92,14 +88,12 @@ export function useAlquileresRealtime() {
                 applyRealtimeChange
             )
             .subscribe((status) => {
-                console.log('🔵 Realtime subscription status:', status);
+                console.log('Realtime subscription status:', status);
                 if (status === 'SUBSCRIBED') {
-                    setRealtimeStatus('CONNECTED');
                     console.log('Realtime CONECTADO - Los cambios se verán en tiempo real');
                     // Sincronizar datos al conectarse exitosamente
                     queryClient.invalidateQueries({ queryKey: alquileresQueryKey });
                 } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
-                    setRealtimeStatus('DISCONNECTED');
                     console.log('Realtime DESCONECTADO - Verifica la configuración');
                 }
             });
@@ -114,7 +108,6 @@ export function useAlquileresRealtime() {
         isLoading,
         error,
         refetch,
-        realtimeStatus,
     };
 }
 
@@ -131,27 +124,3 @@ export function useCreateAlquiler() {
     });
 }
 
-// Hook para actualizar estado
-export function useUpdateAlquilerEstado() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: ({ id, estado }: { id: number; estado: string }) =>
-            updateAlquilerEstado(id, estado),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: alquileresQueryKey });
-        },
-    });
-}
-
-// Hook para eliminar alquiler
-export function useDeleteAlquiler() {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: deleteAlquiler,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: alquileresQueryKey });
-        },
-    });
-}

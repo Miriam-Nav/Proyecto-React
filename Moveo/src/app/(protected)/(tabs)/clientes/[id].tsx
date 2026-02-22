@@ -234,7 +234,7 @@ export default function ClienteDetalle() {
                       try {
                         setBorrando(true);
                         await ejecutarEliminar(idNum);
-                        Alert.alert("Éxito", `Cliente "${cliente?.nombre}" eliminado correctamente`);
+                        Alert.alert("Bien", `Cliente "${cliente?.nombre}" eliminado correctamente`);
                         router.back();
                       } catch (e) {
                         const mensaje = e instanceof Error ? e.message : "No se pudo eliminar";
