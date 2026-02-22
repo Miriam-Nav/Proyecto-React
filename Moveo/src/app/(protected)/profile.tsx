@@ -94,15 +94,61 @@ export default function ProfileScreen() {
 
     if (result.canceled || !result.assets[0]) return;
 
+    await uploadAvatar(result.assets[0].uri);
+  };
+
+  const handleTakePhoto = async () => {
+    if (!user || isUploadingAvatar) return;
+
+    // Pedir permisos de cámara
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Error", "Se necesita permiso para usar la cámara");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (result.canceled || !result.assets[0]) return;
+
+    await uploadAvatar(result.assets[0].uri);
+  };
+
+  const handleAvatarOptions = () => {
+    Alert.alert(
+      "Cambiar foto de perfil",
+      "¿Cómo quieres agregar tu foto?",
+      [
+        {
+          text: "Tomar foto",
+          onPress: handleTakePhoto,
+        },
+        {
+          text: "Elegir de galería",
+          onPress: handlePickAvatar,
+        },
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+      ]
+    );
+  };
+
+  const uploadAvatar = async (fileUri: string) => {
     try {
       setIsUploadingAvatar(true);
       
       console.log("Iniciando subida de avatar");
-      console.log("URI del archivo:", result.assets[0].uri);
+      console.log("URI del archivo:", fileUri);
       
       const updatedUser = await uploadUserAvatar({
-        userId: user.id,
-        fileUri: result.assets[0].uri,
+        userId: user!.id,
+        fileUri,
       });
 
       console.log("Avatar subido exitosamente");
@@ -161,7 +207,8 @@ export default function ProfileScreen() {
         {/* BOTÓN CÁMARA */}
         <IconButton icon="camera" mode="contained" size={20}
           containerColor={theme.colors.secondary} iconColor={theme.colors.surface}
-          onPress={handlePickAvatar}
+          onPress={handleAvatarOptions}
+          disabled={isUploadingAvatar}
           style={{ 
             position: 'absolute', 
             bottom: 15,
