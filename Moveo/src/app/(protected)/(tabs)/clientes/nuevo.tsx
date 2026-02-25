@@ -90,7 +90,7 @@ export default function NuevoCliente() {
           {/* handleSubmit valida con Zod y luego ejecuta onSubmit */}
           <PrimaryButton 
             onPress={handleSubmit(onSubmit)} 
-            text={cargando ? "Guardando..." : "Crear Cliente"}
+            text={cargando ? "Guardando..." : "Crear"}
           />
           
           <SecondaryButton onPress={() => router.back()} text="Cancelar" />

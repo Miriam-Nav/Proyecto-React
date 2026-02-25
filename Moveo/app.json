@@ -23,6 +23,9 @@
         "UIBackgroundModes": [
           "remote-notification"
         ]
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
       }
     },
     "android": {
@@ -37,8 +40,9 @@
         "VIBRATE",
         "POST_NOTIFICATIONS"
       ],
-      "package": "Moveo.V1",
-      "googleServicesFile": "./google-services.json"
+      "package": "Moveo.V1", 
+      "googleServicesFile": "./google-services.json",
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -54,6 +58,9 @@
         }
       ],
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "updates": {
+      "url": "https://u.expo.dev/d5c89956-e069-4fdc-96df-90aeebc9c2cb"
+    }
   }
 }

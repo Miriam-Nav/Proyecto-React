@@ -12,9 +12,9 @@ export const logginStyles = (theme) => StyleSheet.create({
     width: "90%",
     maxWidth: 450,
     padding: 25,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceVariant,
     borderRadius: 15,
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: theme.colors.outlineVariant,
   },
   headerLoggin: {

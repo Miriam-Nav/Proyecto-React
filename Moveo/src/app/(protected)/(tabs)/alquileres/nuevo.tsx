@@ -7,12 +7,12 @@ import { AlquilerSchema, AlquilerFormValues } from "../../../../schemas/alquiler
 import { useClientes } from "../../../../hooks/useClientes";
 import { useVideojuegos } from "../../../../hooks/useVideojuegos";
 import { useCreateAlquiler } from "../../../../hooks/useAlquileres";
-import { ControlledTextInput } from "../../../../components/ControlledTextInput";
-import { DateRangeInput, toAPIDate, diffDays } from "../../../../components/DateInputField";
+import { DateRangeInput, toAPIDate, diffDays, isValidDate } from "../../../../components/DateInputField"; // Añadimos isValidDate
 import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
+import { RentalSummary } from "../../../../components/RentalSummary"; // <--- Importamos el componente
 import { commonStyles } from "../../../../styles/common.styles";
 import { formStyles } from "../../../../styles/form.styles";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SearchDropdown } from "@/components/SearchDropdown";
 
 export default function NuevoAlquiler() {
@@ -43,14 +43,18 @@ export default function NuevoAlquiler() {
   const fechaFin = watch("fecha_fin_prevista");
   const videojuegoId = watch("videojuego_id");
 
+  // --- LÓGICA DE CÁLCULO ---
   const videojuego = videojuegos.find(v => v.id === videojuegoId);
-  const dias = fechaInicio && fechaFin ? diffDays(fechaInicio, fechaFin) : 0;
+  
+  // Solo calculamos si las fechas son válidas (tienen 10 caracteres y formato correcto)
+  const fechasListas = fechaInicio?.length === 10 && fechaFin?.length === 10 && isValidDate(fechaInicio) && isValidDate(fechaFin);
+  const dias = fechasListas ? diffDays(fechaInicio, fechaFin) : 0;
   const total = videojuego ? dias * videojuego.precio_alquiler_dia : 0;
 
-  // Actualiza total automáticamente
-  if (total !== watch("total_pagado")) {
+  // Actualiza el valor del formulario solo cuando cambia el total calculado
+  useEffect(() => {
     setValue("total_pagado", total);
-  }
+  }, [total, setValue]);
 
   const onSubmit = async (data: AlquilerFormValues) => {
     try {
@@ -63,10 +67,9 @@ export default function NuevoAlquiler() {
         total_pagado: Number(data.total_pagado),
       });
 
-
       Alert.alert("Bien", "Alquiler creado correctamente");
       router.back();
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert("Error", error.message);
     } finally {
       setCargando(false);
@@ -79,36 +82,40 @@ export default function NuevoAlquiler() {
         <Text style={commonS.sectionTitle}>Nuevo Alquiler</Text>
 
         {/* CLIENTE */}
-        <Controller
-          control={control}
-          name="cliente_id"
-          render={({ field: { onChange, value } }) => (
-            <SearchDropdown
-              label="Cliente"
-              value={value}
-              onChange={onChange}
-              items={clientes}
-              getLabel={(c) => c.nombre}
-              keyExtractor={(c) => c.id.toString()}
-            />
-          )}
-        />
+        <View style={{ zIndex: 2000 }}> 
+          <Controller
+            control={control}
+            name="cliente_id"
+            render={({ field: { onChange, value } }) => (
+              <SearchDropdown
+                label="Cliente"
+                value={value}
+                onChange={onChange}
+                items={clientes}
+                getLabel={(c) => c.nombre}
+                keyExtractor={(c) => c.id.toString()}
+              />
+            )}
+          />
+        </View>
 
         {/* VIDEOJUEGO */}
-        <Controller
-          control={control}
-          name="videojuego_id"
-          render={({ field: { onChange, value } }) => (
-            <SearchDropdown
-              label="Videojuego"
-              value={value}
-              onChange={onChange}
-              items={videojuegos}
-              getLabel={(v) => v.titulo}
-              keyExtractor={(v) => v.id.toString()}
-            />
-          )}
-        />
+        <View style={{ zIndex: 1000, marginTop: 10 }}>
+          <Controller
+            control={control}
+            name="videojuego_id"
+            render={({ field: { onChange, value } }) => (
+              <SearchDropdown
+                label="Videojuego"
+                value={value}
+                onChange={onChange}
+                items={videojuegos}
+                getLabel={(v) => v.titulo}
+                keyExtractor={(v) => v.id.toString()}
+              />
+            )}
+          />
+        </View>
 
         {/* FECHAS */}
         <DateRangeInput
@@ -118,15 +125,15 @@ export default function NuevoAlquiler() {
           onChangeFechaFin={(v) => setValue("fecha_fin_prevista", v)}
         />
 
-        {/* TOTAL */}
-        <ControlledTextInput
-          control={control}
-          name="total_pagado"
-          label="Total a pagar"
-          editable={false}
-          errors={errors}
+        {/* RESUMEN DE ALQUILER */}
+        <RentalSummary 
+          dias={dias}
+          totalAPagar={total}
+          videojuegoSeleccionado={videojuego ? {
+            titulo: videojuego.titulo,
+            precioPorDia: videojuego.precio_alquiler_dia
+          } : undefined}
         />
-
 
         {/* BOTONES */}
         <View style={formS.buttons}>

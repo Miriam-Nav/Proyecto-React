@@ -119,13 +119,14 @@ export default function ClienteDetalle() {
         {/* HEADER */}
         <CustomHeader title={cliente.nombre} />
 
-        <View style={[idS.header, { alignItems: 'center', marginTop: 20 }]}>
+        <View style={[idS.header, { alignItems: 'center' }]}>
           <View style={{ position: 'relative' }}> 
             {/* CONTENEDOR DEL BORDE */}
             <View style={{
               borderRadius: 100,
               padding: 3,
               backgroundColor: theme.colors.primary,
+              marginTop: 30
             }}>
               {subiendoImagen ? (
                 <View style={{ width: 80, height: 80, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.surfaceVariant, borderRadius: 40 }}>
@@ -189,6 +190,7 @@ export default function ClienteDetalle() {
           ) : (
             alquileres.map((pedido) => (
               <InfoCardPedidos
+                key={pedido.id}
                 codigo={`ALQ-${pedido.id}`}
                 estado={(pedido.estado).toUpperCase()}
                 fechaInicio={pedido.fecha_inicio}
@@ -207,7 +209,7 @@ export default function ClienteDetalle() {
                 pathname: "/clientes/editar",
                 params: { id: cliente.id }
               });
-            }} text="Editar Cliente" 
+            }} text="Editar" 
           />
 
           {/* GESTIONAR ESTADO */}
@@ -216,7 +218,7 @@ export default function ClienteDetalle() {
                 pathname: "/clientes/modal",
                 params: { id: cliente.id, nombre: cliente.nombre }
               });
-            }} text="Gestionar Estado" 
+            }} text="Estado" 
           />
 
           {/* ELIMINAR */}
@@ -247,7 +249,7 @@ export default function ClienteDetalle() {
                 ]
               );
             }} 
-            text={borrando ? "Eliminando..." : "Eliminar Cliente"}
+            text={borrando ? "Eliminando..." : "Eliminar"}
             color={theme.colors.error}
           />
         </View>

@@ -2,7 +2,7 @@ import React from "react";
 import { View, ScrollView, Pressable, StyleSheet } from "react-native";
 import { Text, useTheme, Avatar, Card } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { useUserStore } from "../../../stores/user.store";
+import { useUserStore } from "../../../stores/userStore";
 import { commonStyles } from "../../../styles/common.styles";
 import { formStyles } from "../../../styles/form.styles";
 import { idStyles } from "../../../styles/id.styles";

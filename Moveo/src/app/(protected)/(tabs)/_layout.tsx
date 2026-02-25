@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useUserStore } from "../../../stores/user.store";
+import { useUserStore } from "../../../stores/userStore";
 import { useTheme } from "react-native-paper";
 
 export default function TabsLayout() {

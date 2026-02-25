@@ -38,7 +38,7 @@ export default function ClientesScreen() {
     return (
       <View style={commonS.center}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={{ marginTop: 10 }}>Cargando clientes de Supabase...</Text>
+        <Text style={commonS.loadingText}>Cargando clientes de Supabase...</Text>
       </View>
     );
   }

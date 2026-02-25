@@ -13,12 +13,6 @@ type UserState = {
     clearUser: () => void;
 };
 
-const noopStorage: StateStorage = {
-    getItem: async () => null,
-    setItem: async () => { },
-    removeItem: async () => { },
-};
-
 const webStorage: StateStorage = {
     getItem: async (name) => {
         try {

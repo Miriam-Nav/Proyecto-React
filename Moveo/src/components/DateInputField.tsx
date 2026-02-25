@@ -1,8 +1,10 @@
 import React from "react";
 import { View, Text } from "react-native";
 import { TextInput as PaperInput, useTheme } from "react-native-paper";
+import { formStyles } from "../styles/form.styles";
 
-// Helpers de fecha
+// --- Helpers de fecha ---
+
 export const todayDDMMYYYY = (): string => {
   const d = new Date();
   return [d.getDate(), d.getMonth() + 1, d.getFullYear()]
@@ -31,7 +33,25 @@ export const diffDays = (start: string, end: string): number => {
   return Math.max(1, Math.ceil(diff / 86_400_000));
 };
 
-// Componentes
+// --- Lógica de la Máscara ---
+
+const applyDateMask = (text: string) => {
+  // Limpiamos todo lo que no sea número
+  const cleaned = text.replace(/\D/g, "");
+  let formatted = cleaned;
+
+  if (cleaned.length > 2) {
+    formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
+  }
+  if (cleaned.length > 4) {
+    formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4, 8)}`;
+  }
+  
+  // Retornamos máximo 10 caracteres (dd/mm/yyyy)
+  return formatted.slice(0, 10);
+};
+
+// --- Componentes ---
 
 interface DateInputProps {
   label: string;
@@ -41,23 +61,33 @@ interface DateInputProps {
 
 function DateInput({ label, value, onChangeText }: DateInputProps) {
   const theme = useTheme();
-  const hasError = value.length > 0 && !isValidDate(value);
+  const formS = formStyles(theme);
+  const hasError = value.length === 10 && !isValidDate(value);
+
+  const handleChangeText = (text: string) => {
+    // Aplicamos la máscara antes de llamar al onChange original
+    const maskedText = applyDateMask(text);
+    onChangeText(maskedText);
+  };
 
   return (
-    <View>
+    <View style={{ marginBottom: 15 }}>
       <PaperInput
         label={label}
         value={value}
-        onChangeText={onChangeText}
+        onChangeText={handleChangeText}
         mode="outlined"
         placeholder="dd/mm/yyyy"
         keyboardType="numeric"
         error={hasError}
-        style={{ fontFamily: "monospace", fontSize: 13 }}
+        maxLength={10}
+        style={formS.input}
+        outlineStyle={formS.inputOutline}
+        contentStyle={formS.inputContent}
       />
       {hasError && (
-        <Text style={{ color: theme.colors.error, fontSize: 12, marginTop: 4 }}>
-          Formato inválido. Usa dd/mm/yyyy
+        <Text style={formS.error}>
+          Fecha no válida. Verifica el día y el mes.
         </Text>
       )}
     </View>
@@ -79,20 +109,16 @@ export function DateRangeInput({
 }: DateRangeInputProps) {
   return (
     <View>
-      <View style={{ marginBottom: 20 }}>
-        <DateInput
-          label="Fecha de inicio (dd/mm/yyyy)"
-          value={fechaInicio}
-          onChangeText={onChangeFechaInicio}
-        />
-      </View>
-      <View style={{ marginBottom: 20 }}>
-        <DateInput
-          label="Fecha de fin (dd/mm/yyyy)"
-          value={fechaFin}
-          onChangeText={onChangeFechaFin}
-        />
-      </View>
+      <DateInput
+        label="Fecha de inicio"
+        value={fechaInicio}
+        onChangeText={onChangeFechaInicio}
+      />
+      <DateInput
+        label="Fecha de fin prevista"
+        value={fechaFin}
+        onChangeText={onChangeFechaFin}
+      />
     </View>
   );
 }

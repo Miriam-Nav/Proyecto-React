@@ -1,3 +1,5 @@
+import { formStyles } from "@/styles/form.styles";
+import { idStyles } from "@/styles/id.styles";
 import React from "react";
 import { View, Text } from "react-native";
 import { Card, useTheme } from "react-native-paper";
@@ -17,9 +19,11 @@ export function RentalSummary({
   videojuegoSeleccionado,
 }: RentalSummaryProps) {
   const theme = useTheme();
+  const idS = idStyles(theme);
 
   return (
-    <Card style={{ marginBottom: 20 }}>
+    
+    <Card style={[idS.infoCard, { marginBottom: 10, padding:0 }]}>
       <Card.Content>
         <Text
           style={{

@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormValues, loginSchema, RegisterFormValues, registerSchema } from "../schemas/auth.schema";
 import { ControlledEmailInput, ControlledPasswordInput, ControlledTextInput } from "../components/ControlledTextInput";
 import { isEmailInUse, logIn, register } from "../services/authService";
-import { useUserStore } from "../stores/user.store";
+import { useUserStore } from "../stores/userStore";
 
 export default function LoginScreen() {
   const theme = useTheme();

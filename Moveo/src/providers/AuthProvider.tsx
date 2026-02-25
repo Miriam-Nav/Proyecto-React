@@ -1,6 +1,6 @@
 import { SplashScreen, useRouter, useSegments } from "expo-router";
 import { createContext, PropsWithChildren, useEffect, useMemo, useState } from "react";
-import { useUserStore } from "../stores/user.store";
+import { useUserStore } from "../stores/userStore";
 import { supabase } from "../config/supabaseClient";
 import { fetchProfileByAuthId } from "../services/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";

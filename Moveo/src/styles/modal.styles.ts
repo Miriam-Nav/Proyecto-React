@@ -5,7 +5,7 @@ export const modalStyles = (theme) => StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: 12,
     padding: 24,
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: theme.colors.outlineVariant,
     alignItems: "center"
   },

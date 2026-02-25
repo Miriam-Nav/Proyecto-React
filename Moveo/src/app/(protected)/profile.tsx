@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, ScrollView, Alert, } from "react-native";
 import { Text, TextInput, useTheme, Avatar, IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { useUserStore } from "../../stores/user.store";
+import { useUserStore } from "../../stores/userStore";
 import { commonStyles } from "../../styles/common.styles";
 import { formStyles } from "../../styles/form.styles";
 import { CustomHeader } from "../../components/HeaderApp";

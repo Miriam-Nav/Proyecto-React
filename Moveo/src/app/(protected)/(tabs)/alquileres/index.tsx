@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, Pressable } from "react-native";
+import { View, Text, ScrollView, Pressable } from "react-native";
+import { ActivityIndicator } from "react-native-paper";
 import { useTheme } from "react-native-paper";
 import { Link } from "expo-router";
 import { useFocusEffect } from "expo-router";
@@ -19,8 +20,8 @@ export default function AlquileresScreen() {
   // Refresca los datos cada vez que la pantalla vuelve a estar en foco
   useFocusEffect(
     useCallback(() => {
-      refetch?.();
-    }, [])
+      refetch();
+    }, [refetch])
   );
 
   if (isLoading) {
