@@ -1,21 +1,18 @@
 import React, { useCallback } from "react";
-import { View, Text, ScrollView, Pressable } from "react-native";
-import { ActivityIndicator } from "react-native-paper";
-import { useTheme } from "react-native-paper";
-import { Link } from "expo-router";
-import { useFocusEffect } from "expo-router";
-import { useAlquileresRealtime } from "../../../../hooks/useAlquileres";
-import { CustomHeader } from "../../../../components/HeaderApp";
+import { View, Text, Pressable, FlatList } from "react-native";
+import { ActivityIndicator, useTheme } from "react-native-paper";
+import { Link, useFocusEffect } from "expo-router";
+import { useAlquileres } from "../../../../hooks/useAlquileres";
 import { commonStyles } from "../../../../styles/common.styles";
-import { InfoCardAlquiler } from "@/components/CardApp";
-import { clientStyles } from "@/styles/client.styles";
+import { clientStyles } from "../../../../styles/client.styles";
+import { InfoCardAlquiler } from "../../../../components/CardApp";
 
 export default function AlquileresScreen() {
   const theme = useTheme();
   const commonS = commonStyles(theme);
   const clientS = clientStyles(theme);
 
-  const { alquileres, isLoading, error, refetch } = useAlquileresRealtime();
+  const { alquileres, isLoading, error, refetch } = useAlquileres();
 
   // Refresca los datos cada vez que la pantalla vuelve a estar en foco
   useFocusEffect(
@@ -34,53 +31,63 @@ export default function AlquileresScreen() {
   }
 
   if (error) {
-      return (
-        <View style={commonS.center}>
-          <Text>Error al conectar con el servidor.</Text>
-          <Pressable onPress={() => refetch()} style={{ marginTop: 10 }}>
-              <Text style={{ color: theme.colors.primary }}>Reintentar</Text>
-          </Pressable>
-        </View>
-      );
-    }
+    return (
+      <View style={commonS.center}>
+        <Text>Error al conectar con el servidor.</Text>
+        <Pressable onPress={() => refetch()} style={{ marginTop: 10 }}>
+          <Text style={{ color: theme.colors.primary }}>Reintentar</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <ScrollView style={commonS.screen} contentContainerStyle={{ paddingBottom: 100 }}>
-        <CustomHeader title="Gestión de Alquileres" />
+    <View style={commonS.screen}>
+      {/* HEADER */}
+      <View style={commonS.header}>
+        <Text style={commonS.headerTitle}>GESTIÓN DE ALQUILERES</Text>
+        <Text style={commonS.headerSubtitle}>
+          {alquileres.length} alquiler{alquileres.length !== 1 ? "es" : ""} registrado{alquileres.length !== 1 ? "s" : ""}
+        </Text>
+      </View>
 
-        <View style={{ padding: 20, paddingTop: 0 }}>
-          <Text style={[commonS.sectionTitle, { marginBottom: 10, marginTop: 20 }]}>
-            LISTA DE ALQUILERES ({alquileres.length})
-          </Text>
-
-          {alquileres.length === 0 ? (
-            <View style={{ padding: 40, alignItems: "center", backgroundColor: theme.colors.surfaceVariant, borderRadius: 12 }}>
-              <Text style={{ color: theme.colors.onSurfaceVariant, fontFamily: "monospace", fontSize: 16, textAlign: "center" }}>
-                No hay alquileres aún{"\n"}Presiona el botón + para crear uno
-              </Text>
-            </View>
-          ) : ( 
-            alquileres.map((alquiler) => (
+      {/* LISTA */}
+      <View style={{ flex: 1, padding: 10 }}>
+        {alquileres.length === 0 ? (
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 40 }}>
+            <Text style={{ 
+              color: theme.colors.onSurfaceVariant, 
+              fontFamily: "monospace", 
+              fontSize: 16, 
+              textAlign: "center" 
+            }}>
+              No hay alquileres aún{"\n"}Presiona el botón + para crear uno
+            </Text>
+          </View>
+        ) : (
+          <FlatList
+            data={alquileres}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
               <InfoCardAlquiler 
-                key={alquiler.id}
-                tituloVideojuego={alquiler.videojuego?.titulo || "Desconocido"}
-                nombreCliente={alquiler.cliente?.nombre || "Desconocido"}
-                fechaInicio={new Date(alquiler.fecha_inicio).toLocaleDateString()}
-                fechaFin={new Date(alquiler.fecha_fin_prevista).toLocaleDateString()}
-                estado={alquiler.estado}
+                tituloVideojuego={item.videojuego?.titulo || "Desconocido"}
+                nombreCliente={item.cliente?.nombre || "Desconocido"}
+                fechaInicio={new Date(item.fecha_inicio).toLocaleDateString()}
+                fechaFin={new Date(item.fecha_fin_prevista).toLocaleDateString()}
+                estado={item.estado}
               />
-            ))
-          )}
-        </View>
-      </ScrollView>
+            )}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          />
+        )}
 
-      {/* BOTON CREAR CLIENTE */}
-      <Link href="/alquileres/nuevo" asChild>
-        <Pressable style={clientS.add}>
-          <Text style={clientS.addText}>+</Text>
-        </Pressable>
-      </Link>
+        {/* BOTÓN CREAR ALQUILER */}
+        <Link href="/alquileres/nuevo" asChild>
+          <Pressable style={clientS.add}>
+            <Text style={clientS.addText}>+</Text>
+          </Pressable>
+        </Link>
+      </View>
     </View>
   );
 }

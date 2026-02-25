@@ -47,7 +47,7 @@ export function SearchDropdown<T extends { id: number }>({
     <View style={{ marginBottom: 15 }} ref={inputRef} collapsable={false}>
       <PaperInput
         label={label}
-        // Mantenemos el texto de búsqueda mientras está abierto para que no salte el teclado
+        // Mantiene el texto de búsqueda mientras está abierto para que no salte el teclado
         value={open ? query : (selectedItem ? getLabel(selectedItem) : "")}
         onChangeText={(text) => {
           setQuery(text);

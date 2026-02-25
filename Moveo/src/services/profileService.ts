@@ -1,5 +1,6 @@
 import { supabase } from "../config/supabaseClient";
 import { User } from "../types/User";
+import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
 import { decode } from 'base64-arraybuffer';
 
@@ -7,25 +8,48 @@ export const uploadUserAvatar = async ({ userId, fileUri }: { userId: number, fi
   // Preparar el archivo
   const ext = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
   const fileName = `avatar-${userId}-${Date.now()}.${ext}`;
-
-  // Leer el archivo como Base64 usando expo-file-system legacy
-  const base64 = await FileSystem.readAsStringAsync(fileUri, {
-    encoding: 'base64',
-  });
-
-  // Convertir Base64 a ArrayBuffer
-  const arrayBuffer = decode(base64);
-
-  // Determinar el tipo MIME según la extensión
   const contentType = ext === 'png' ? 'image/png' : 'image/jpeg';
 
-  // Subir al Bucket usando ArrayBuffer
-  const { error: uploadError } = await supabase.storage
-    .from('avatars')
-    .upload(fileName, arrayBuffer, { 
-      contentType,
-      upsert: true 
-    });
+  let uploadError;
+
+  // En web, usar fetch con blob
+  if (Platform.OS === 'web') {
+    try {
+      const response = await fetch(fileUri);
+      const blob = await response.blob();
+
+      const { error } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, blob, { 
+          contentType,
+          upsert: true 
+        });
+
+      uploadError = error;
+    } catch (e) {
+      uploadError = e;
+    }
+  } else {
+    // En móvil, usar FileSystem con base64
+    try {
+      const base64 = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: 'base64',
+      });
+
+      const arrayBuffer = decode(base64);
+
+      const { error } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, arrayBuffer, { 
+          contentType,
+          upsert: true 
+        });
+
+      uploadError = error;
+    } catch (e) {
+      uploadError = e;
+    }
+  }
 
   if (uploadError) throw uploadError;
 

@@ -36,7 +36,7 @@ export const diffDays = (start: string, end: string): number => {
 // --- Lógica de la Máscara ---
 
 const applyDateMask = (text: string) => {
-  // Limpiamos todo lo que no sea número
+  // Limpia todo lo que no sea número
   const cleaned = text.replace(/\D/g, "");
   let formatted = cleaned;
 
@@ -47,7 +47,7 @@ const applyDateMask = (text: string) => {
     formatted = `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4, 8)}`;
   }
   
-  // Retornamos máximo 10 caracteres (dd/mm/yyyy)
+  // Retorna máximo 10 caracteres (dd/mm/yyyy)
   return formatted.slice(0, 10);
 };
 
@@ -65,7 +65,7 @@ function DateInput({ label, value, onChangeText }: DateInputProps) {
   const hasError = value.length === 10 && !isValidDate(value);
 
   const handleChangeText = (text: string) => {
-    // Aplicamos la máscara antes de llamar al onChange original
+    // Aplica la máscara antes de llamar al onChange original
     const maskedText = applyDateMask(text);
     onChangeText(maskedText);
   };

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, ScrollView, Alert, } from "react-native";
+import { View, ScrollView, Alert, Platform } from "react-native";
 import { Text, TextInput, useTheme, Avatar, IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { useUserStore } from "../../stores/userStore";
@@ -119,6 +119,13 @@ export default function ProfileScreen() {
   };
 
   const handleAvatarOptions = () => {
+    // Si es web, abrir galería directamente
+    if (Platform.OS === 'web') {
+      handlePickAvatar();
+      return;
+    }
+
+    // Si es móvil, mostrar opciones
     Alert.alert(
       "Cambiar foto de perfil",
       "¿Cómo quieres agregar tu foto?",
@@ -189,7 +196,10 @@ export default function ProfileScreen() {
           marginBottom: 15,
           backgroundColor: theme.colors.primary,
         }}>
-          {user?.avatarUrl ? (
+          {isUploadingAvatar ? (
+            <View style={{ width: 80, height: 80, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.surfaceVariant, borderRadius: 40 }}>
+            </View>
+          ) : user?.avatarUrl ? (
             <Avatar.Image 
               size={80} 
               source={{ uri: user.avatarUrl + '?t=' + new Date().getTime() }} 
@@ -208,14 +218,14 @@ export default function ProfileScreen() {
         <IconButton icon="camera" mode="contained" size={20}
           containerColor={theme.colors.secondary} iconColor={theme.colors.surface}
           onPress={handleAvatarOptions}
-          disabled={isUploadingAvatar}
           style={{ 
             position: 'absolute', 
             bottom: 15,
             right: -5, 
             margin: 0, 
             borderWidth: 2, 
-            borderColor: theme.colors.surface
+            borderColor: theme.colors.surface,
+            zIndex: 10
           }}
         />
       </View>

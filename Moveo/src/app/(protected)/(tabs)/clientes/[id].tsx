@@ -29,7 +29,7 @@ export default function ClienteDetalle() {
   const [borrando, setBorrando] = useState(false);
   const [subiendoImagen, setSubiendoImagen] = useState(false);
 
-  const handlePickImage = async () => {
+  const handlePickFromGallery = async () => {
     // Pedir permisos
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
@@ -45,18 +45,67 @@ export default function ClienteDetalle() {
     });
 
     if (!result.canceled && result.assets[0].uri) {
-      try {
-        setSubiendoImagen(true);
-        // Llama al servicio 
-        await uploadClienteAvatar(idNum, result.assets[0].uri);
-        // Recarga los datos
-        refetchCliente(); 
-      } catch (e) {
-        Alert.alert("Error", "Error al subir imagen: " + e.message);
-      } finally {
-        setSubiendoImagen(false);
-      }
+      await uploadImage(result.assets[0].uri);
     }
+  };
+
+  const handleTakePhoto = async () => {
+    // Pedir permisos de cámara
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permisos', 'Se necesita permiso para usar la cámara');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled && result.assets[0].uri) {
+      await uploadImage(result.assets[0].uri);
+    }
+  };
+
+  const uploadImage = async (uri: string) => {
+    try {
+      setSubiendoImagen(true);
+      await uploadClienteAvatar(idNum, uri);
+      refetchCliente(); 
+    } catch (e) {
+      Alert.alert("Error", "Error al subir imagen: " + e.message);
+    } finally {
+      setSubiendoImagen(false);
+    }
+  };
+
+  const handlePickImage = () => {
+    // Si es web, abrir galería directamente
+    if (Platform.OS === 'web') {
+      handlePickFromGallery();
+      return;
+    }
+
+    // Si es móvil, mostrar opciones
+    Alert.alert(
+      "Cambiar foto de perfil",
+      "¿Cómo quieres agregar la foto?",
+      [
+        {
+          text: "Tomar foto",
+          onPress: handleTakePhoto,
+        },
+        {
+          text: "Elegir de galería",
+          onPress: handlePickFromGallery,
+        },
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+      ]
+    );
   };
 
   const abrirMapa = () => {

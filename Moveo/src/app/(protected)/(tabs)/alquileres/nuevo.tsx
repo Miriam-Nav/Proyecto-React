@@ -7,9 +7,9 @@ import { AlquilerSchema, AlquilerFormValues } from "../../../../schemas/alquiler
 import { useClientes } from "../../../../hooks/useClientes";
 import { useVideojuegos } from "../../../../hooks/useVideojuegos";
 import { useCreateAlquiler } from "../../../../hooks/useAlquileres";
-import { DateRangeInput, toAPIDate, diffDays, isValidDate } from "../../../../components/DateInputField"; // Añadimos isValidDate
+import { DateRangeInput, toAPIDate, diffDays, isValidDate } from "../../../../components/DateInputField"; 
 import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
-import { RentalSummary } from "../../../../components/RentalSummary"; // <--- Importamos el componente
+import { RentalSummary } from "../../../../components/RentalSummary"; 
 import { commonStyles } from "../../../../styles/common.styles";
 import { formStyles } from "../../../../styles/form.styles";
 import { useState, useEffect } from "react";
@@ -46,7 +46,7 @@ export default function NuevoAlquiler() {
   // --- LÓGICA DE CÁLCULO ---
   const videojuego = videojuegos.find(v => v.id === videojuegoId);
   
-  // Solo calculamos si las fechas son válidas (tienen 10 caracteres y formato correcto)
+  // Solo calcula si las fechas son válidas (tienen 10 caracteres y formato correcto)
   const fechasListas = fechaInicio?.length === 10 && fechaFin?.length === 10 && isValidDate(fechaInicio) && isValidDate(fechaFin);
   const dias = fechasListas ? diffDays(fechaInicio, fechaFin) : 0;
   const total = videojuego ? dias * videojuego.precio_alquiler_dia : 0;

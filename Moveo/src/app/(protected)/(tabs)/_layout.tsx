@@ -38,6 +38,19 @@ export default function TabsLayout() {
         }} 
       />
       <Tabs.Screen 
+        name="videojuegos" 
+        options={{ 
+          title: "Videojuegos",
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons 
+              name={focused ? "gamepad-variant" : "gamepad-variant-outline"} 
+              size={26} 
+              color={color} 
+            />
+          )
+        }} 
+      />
+      <Tabs.Screen 
         name="clientes" 
         options={{ 
           title: "Clientes",
@@ -55,6 +68,7 @@ export default function TabsLayout() {
         name="alquileres" 
         options={{ 
           title: "Alquileres",
+          href: isAdmin ? "/(protected)/(tabs)/alquileres" : null,
           tabBarIcon: ({ color, focused }) => (
             <MaterialCommunityIcons 
               name={focused ? "package-variant" : "package-variant-closed"} 

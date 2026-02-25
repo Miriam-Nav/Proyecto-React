@@ -1,17 +1,62 @@
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import { supabase } from "../config/supabaseClient";
 import { deleteCliente, getClienteById, getClientes, updateCliente } from '../services/clienteService';
 import { getAlquileresByCliente } from '../services/alquilerService';
-import { useQueryClient } from "@tanstack/react-query";
 import { createCliente } from "../services/clienteService";
 
-// Listar todos los clientes
+// Hook con Realtime para pantalla de inicio
+export function useClientesRealtime() {
+  const queryClient = useQueryClient();
+
+  const result = useQuery({
+    queryKey: ['clientes'], 
+    queryFn: getClientes,
+    refetchOnMount: 'always',
+    retry: 3,
+  });
+
+  // Suscripción al canal de Realtime
+  useEffect(() => {
+    const applyRealtimeChange = (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
+      queryClient.invalidateQueries({ 
+        queryKey: ['clientes'],
+        refetchType: 'active'
+      });
+    };
+
+    const channel = supabase
+      .channel('clientes-realtime')
+      .on(
+        'postgres_changes',
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'clientes' 
+        },
+        applyRealtimeChange
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('Realtime clientes CONECTADO');
+        }
+      });
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  return result;
+}
+
+// Hook para lista de clientes
 export function useClientes() {
   return useQuery({
     queryKey: ['clientes'], 
     queryFn: getClientes,
-    // Forzar refetch en mount para asegurar datos frescos
     refetchOnMount: 'always',
-    // Reintentar en caso de error inicial
     retry: 3,
   });
 }

@@ -180,7 +180,7 @@ export const updateUserProfile = async (payload: UpdateUserPayload): Promise<Use
         avatar_url?: string;
         role_id?: number;
     }
-    // Construimos el objeto de actualización dinámicamente
+    // Construe el objeto de actualización dinámicamente
     const updateData: UserUpdateRow = {};
     if (payload.name) {
         updateData.name = payload.name.trim();

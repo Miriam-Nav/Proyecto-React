@@ -1,5 +1,8 @@
 import { supabase } from "../config/supabaseClient";
 import { Cliente } from "../types/Clientes";
+import { Platform } from 'react-native';
+import * as FileSystem from 'expo-file-system/legacy';
+import { decode } from 'base64-arraybuffer';
 
 type ClienteRow = {
     id: number;
@@ -137,14 +140,48 @@ export const updateCliente = async (payload: Cliente): Promise<Cliente | undefin
 export const uploadClienteAvatar = async (clienteId: number, fileUri: string) => {
     const ext = fileUri.split('.').pop()?.toLowerCase() || 'jpg';
     const fileName = `client-${clienteId}-${Date.now()}.${ext}`;
+    const contentType = ext === 'png' ? 'image/png' : 'image/jpeg';
 
-    const response = await fetch(fileUri);
-    const blob = await response.blob();
+    let uploadError;
 
-    // Subir al bucket 'avatars'
-    const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(fileName, blob);
+    // En web, usar fetch con blob
+    if (Platform.OS === 'web') {
+        try {
+            const response = await fetch(fileUri);
+            const blob = await response.blob();
+
+            const { error } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, blob, {
+                    contentType,
+                    upsert: true
+                });
+
+            uploadError = error;
+        } catch (e) {
+            uploadError = e;
+        }
+    } else {
+        // En móvil, usar FileSystem con base64
+        try {
+            const base64 = await FileSystem.readAsStringAsync(fileUri, {
+                encoding: 'base64',
+            });
+
+            const arrayBuffer = decode(base64);
+
+            const { error } = await supabase.storage
+                .from('avatars')
+                .upload(fileName, arrayBuffer, {
+                    contentType,
+                    upsert: true
+                });
+
+            uploadError = error;
+        } catch (e) {
+            uploadError = e;
+        }
+    }
 
     if (uploadError) throw uploadError;
 
