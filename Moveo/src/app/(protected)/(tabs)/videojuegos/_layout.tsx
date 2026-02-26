@@ -8,18 +8,7 @@ export default function ClientesLayout() {
       }}
     >
       <Stack.Screen name="index" />
-      <Stack.Screen
-        name="[id]"
-        options={{ headerShown: false }}
-      />
       <Stack.Screen name="nuevo" />
-      <Stack.Screen
-        name="modal"
-        options={{
-          presentation: "modal",
-          headerShown: false,
-        }}
-      />
     </Stack>
   );
 }

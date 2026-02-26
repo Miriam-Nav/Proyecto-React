@@ -1,6 +1,7 @@
 import { View, Text } from "react-native";
 import { idStyles } from "../styles/id.styles";
 import { IconButton, useTheme } from "react-native-paper";
+import { useRouter } from "expo-router";
 
 
 type Props = {
@@ -42,6 +43,7 @@ export function InfoCard({ label, value, icon, onIconPress }: Props) {
 }
 
 type PropsAlquiler = {
+  id: number;
   tituloVideojuego: string;
   nombreCliente: string;
   fechaInicio: string;
@@ -51,6 +53,7 @@ type PropsAlquiler = {
 };
 
 export function InfoCardAlquiler({ 
+  id,
   tituloVideojuego, 
   nombreCliente, 
   fechaInicio, 
@@ -59,7 +62,12 @@ export function InfoCardAlquiler({
   monto 
 }: PropsAlquiler) {
   const theme = useTheme();
+  const router = useRouter();
   const idS = idStyles(theme);
+
+  const handleEditar = () => {
+    router.push(`/alquileres/${id}`);
+  };
 
   // Función para determinar el color del badge según el estado
   const getEstadoColor = (est: string) => {
@@ -75,7 +83,7 @@ export function InfoCardAlquiler({
     <View style={[
       idS.infoCard, 
       { 
-        borderWidth: 2, 
+        borderWidth: 1, 
         borderColor: theme.colors.outlineVariant, 
         marginBottom: 12 
       }
@@ -122,22 +130,34 @@ export function InfoCardAlquiler({
           )}
         </View>
 
-        {/* Badge de Estado */}
-        <View style={{
-          paddingVertical: 4,
-          paddingHorizontal: 10,
-          borderRadius: 8,
-          backgroundColor: getEstadoColor(estado),
-          marginLeft: 8,
-        }}>
-          <Text style={{
-            color: theme.colors.surface,
-            fontWeight: 'bold',
-            fontSize: 10,
-            fontFamily: 'monospace',
+        {/* Badge de Estado y Botones */}
+        <View style={{ alignItems: 'flex-end' }}>
+          <View style={{
+            paddingVertical: 4,
+            paddingHorizontal: 10,
+            borderRadius: 8,
+            backgroundColor: getEstadoColor(estado),
+            marginBottom: 4,
           }}>
-            {estado.toUpperCase()}
-          </Text>
+            <Text style={{
+              color: theme.colors.surface,
+              fontWeight: 'bold',
+              fontSize: 10,
+              fontFamily: 'monospace',
+            }}>
+              {estado.toUpperCase()}
+            </Text>
+          </View>
+
+          {/* Botón Editar */}
+          <IconButton
+            icon="pencil"
+            size={18}
+            mode="contained"
+            containerColor={theme.colors.outlineVariant}
+            iconColor={theme.colors.onTertiary}
+            onPress={handleEditar}
+          />
         </View>
       </View>
     </View>

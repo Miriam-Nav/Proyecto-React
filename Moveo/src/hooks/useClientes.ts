@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 import { supabase } from "../config/supabaseClient";
 import { deleteCliente, getClienteById, getClientes, updateCliente } from '../services/clienteService';
@@ -14,12 +14,14 @@ export function useClientesRealtime() {
     queryKey: ['clientes'], 
     queryFn: getClientes,
     refetchOnMount: 'always',
+    staleTime: 0,
     retry: 3,
   });
 
   // Suscripción al canal de Realtime
   useEffect(() => {
     const applyRealtimeChange = (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
+      console.log('Realtime clientes - evento recibido:', payload.eventType);
       queryClient.invalidateQueries({ 
         queryKey: ['clientes'],
         refetchType: 'active'
@@ -40,6 +42,11 @@ export function useClientesRealtime() {
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           console.log('Realtime clientes CONECTADO');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('Error en canal Realtime clientes');
+          console.error('Verifica que ejecutaste: ALTER PUBLICATION supabase_realtime ADD TABLE clientes;');
+        } else if (status === 'CLOSED') {
+          console.warn('Canal Realtime clientes CERRADO');
         }
       });
 
@@ -62,11 +69,11 @@ export function useClientes() {
 }
 
 // Obtener un solo cliente
-export function useClienteDetalle(id: number) {
+export function useClienteDetalle(id: number, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['cliente', id],
     queryFn: () => getClienteById(id),
-    enabled: !!id,
+    enabled: options?.enabled !== undefined ? options.enabled : !!id,
     refetchOnMount: 'always',
     retry: 3,
   });
@@ -84,30 +91,37 @@ export function useClienteAlquileres(id: number) {
 }
 
 
-export const useNuevoClienteAccion = () => {
+export const useCreateClienteAccion = () => {
   const queryClient = useQueryClient();
+  
+  const mutation = useMutation({
+    mutationFn: (data: Omit<Cliente, "id" | "created_at">) => createCliente(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clientes"] });
+    },
+  });
 
-  const ejecutarCrear = async (data: any) => {
-    const res = await createCliente(data);
-    queryClient.invalidateQueries({ queryKey: ["clientes"] });
-    return res;
+  return { 
+    ejecutarCrear: mutation.mutateAsync,
+    cargando: mutation.isPending 
   };
-
-  return { ejecutarCrear };
 };
 
 export const useUpdateClienteAccion = () => {
   const queryClient = useQueryClient();
 
-  const ejecutarActualizar = async (id: number, data: any) => {
-    const res = await updateCliente({ ...data, id }); 
-    
-    queryClient.invalidateQueries({ queryKey: ["clientes"] });
-    queryClient.invalidateQueries({ queryKey: ["cliente", id] });
-    return res;
-  };
+  const mutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Cliente }) => updateCliente({ ...data, id }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["clientes"] });
+      queryClient.invalidateQueries({ queryKey: ["cliente", variables.id] });
+    },
+  });
 
-  return { ejecutarActualizar };
+  return { 
+    ejecutarActualizar: (id: number, data: Cliente) => mutation.mutateAsync({ id, data }),
+    cargando: mutation.isPending 
+  };
 };
 
 export const useDeleteClienteAccion = () => {

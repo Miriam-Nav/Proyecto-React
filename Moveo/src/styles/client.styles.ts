@@ -7,7 +7,7 @@ export const clientStyles = (theme) => StyleSheet.create({
     marginBottom: 15,
   },
   inputOutline: {
-    borderWidth: 0,
+    borderWidth: 1,
     borderRadius: 10,
     borderColor: theme.colors.surfaceVariant,
   },
@@ -25,7 +25,7 @@ export const clientStyles = (theme) => StyleSheet.create({
     borderTopLeftRadius: 10,
     borderRadius: 50,
     alignItems: "center",
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: theme.colors.outlineVariant,
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 4 },

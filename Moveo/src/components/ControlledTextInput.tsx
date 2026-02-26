@@ -1,20 +1,21 @@
-import { TextInput, useTheme, HelperText } from "react-native-paper"; 
-import { Control, Controller, FieldErrors } from "react-hook-form";
+import { TextInput, useTheme, HelperText, Text } from "react-native-paper"; 
+import { Control, Controller, FieldErrors, FieldValues } from "react-hook-form";
 import { View } from "react-native"; 
 import { formStyles } from "../styles/form.styles";
 import { useState } from "react";
 
-type Props = {
-  control: Control<any>;
+type Props<T extends FieldValues> = {
+  control: Control<T>;
   name: string;
   placeholder?: string;
   label?: string;
   errors: FieldErrors;
   leftIcon?: string;
   editable?: boolean;
+  titleInput?: boolean;
 };
 
-export function ControlledTextInput({
+export function ControlledTextInput<T extends FieldValues>({
   control,
   name,
   placeholder,
@@ -22,7 +23,8 @@ export function ControlledTextInput({
   errors,
   leftIcon,
   editable = true,
-}: Props) {
+  titleInput = false,
+}: Props<T>) {
   const theme = useTheme();
   const formS = formStyles(theme);
   
@@ -31,14 +33,19 @@ export function ControlledTextInput({
       control={control}
       name={name}
       render={({ field }) => (
-        <View style={{ marginBottom: 10 }}> 
+        <View style={{ marginBottom: 15 }}> 
+          {titleInput && label && (
+            <Text style={{ marginBottom: 5, fontWeight: "bold", fontFamily: "monospace", color: theme.colors.onSurface }}>
+              {label}
+            </Text>
+          )}
           <TextInput
             value={field.value?.toString() ?? ""}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
             mode="outlined"
             placeholder={placeholder}
-            label={label}
+            label={!titleInput ? label : undefined}
             placeholderTextColor={theme.colors.outline}
             left={leftIcon ? <TextInput.Icon icon={leftIcon} /> : undefined}
             error={!!errors[name]} 

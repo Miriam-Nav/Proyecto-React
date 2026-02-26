@@ -1,16 +1,19 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { View, FlatList, ActivityIndicator, Pressable } from "react-native";
-import { Text, useTheme } from "react-native-paper";
+import { Text, TextInput, useTheme, FAB } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useFocusEffect } from "expo-router";
-import { useVideojuegos } from "../../../hooks/useVideojuegos";
-import { commonStyles } from "../../../styles/common.styles";
-import { Videojuego } from "../../../types/Videojuegos";
-import { VideojuegoCard } from "../../../components/VideojuegoCard";
+import { Link, useFocusEffect, useRouter } from "expo-router";
+import { clientStyles } from "@/styles/client.styles";
+import { commonStyles } from "@/styles/common.styles";
+import { useVideojuegos } from "@/hooks/useVideojuegos";
+import { VideojuegoCard } from "@/components/VideojuegoCard";
 
 export default function VideojuegosScreen() {
+  const [busqueda, setBusqueda] = useState("");
   const theme = useTheme();
+  const router = useRouter();
   const commonS = commonStyles(theme);
+  const clientS = clientStyles(theme);
   
   const { data: videojuegos = [], isLoading, error, refetch } = useVideojuegos();
 
@@ -21,9 +24,11 @@ export default function VideojuegosScreen() {
     }, [refetch])
   );
 
-  const renderVideojuego = ({ item }: { item: Videojuego }) => (
-    <VideojuegoCard videojuego={item} />
-  );
+  // FILTRADO
+  const juegosFiltrados = useMemo(() => {
+    const texto = busqueda.toLowerCase();
+    return videojuegos.filter((v) => v.titulo.toLowerCase().includes(texto));
+  }, [videojuegos, busqueda]);
 
   if (isLoading) {
     return (
@@ -50,13 +55,26 @@ export default function VideojuegosScreen() {
   return (
     <View style={commonS.screen}>
       {/* HEADER */}
-      <View style={[commonS.header, { paddingBottom: 12 }]}>
+      <View style={[commonS.header]}>
         <Text style={commonS.headerTitle}>VIDEOJUEGOS</Text>
         <Text style={commonS.headerSubtitle}>CATÁLOGO DISPONIBLE</Text>
       </View>
 
       {/* LISTA */}
       <View style={{ flex: 1, padding: 10 }}>
+
+        {/* BARRA DE BUSQUEDA */}
+        <TextInput
+          value={busqueda}
+          onChangeText={setBusqueda}
+          mode="outlined"
+          placeholder="Buscar videojuego..."
+          placeholderTextColor={theme.colors.outline}
+          style={clientS.buscador}
+          outlineStyle={clientS.inputOutline}
+          contentStyle={clientS.inputContent}
+        />
+
         {videojuegos.length === 0 ? (
           <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 40 }}>
             <MaterialCommunityIcons name="gamepad-variant-outline" size={48} color={theme.colors.onSurfaceVariant} />
@@ -66,13 +84,20 @@ export default function VideojuegosScreen() {
           </View>
         ) : (
           <FlatList
-            data={videojuegos}
-            renderItem={renderVideojuego}
+            data={juegosFiltrados}
             keyExtractor={(item) => item.id.toString()}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            contentContainerStyle={{ padding: 10 }}
+            renderItem={({ item }) => <VideojuegoCard videojuego={item} />}
           />
         )}
       </View>
+
+      {/* BOTÓN NUEVO*/}
+        <Link href="/videojuegos/nuevo" asChild>
+          <Pressable style={clientS.add}>
+            <Text style={clientS.addText}>+</Text>
+          </Pressable>
+        </Link>
     </View>
   );
 }

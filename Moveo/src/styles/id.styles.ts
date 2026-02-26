@@ -51,7 +51,7 @@ export const idStyles = (theme) => StyleSheet.create({
     backgroundColor: theme.colors.surface,
     padding: 20,
     borderRadius: 12,
-    borderWidth: 3,
+    borderWidth: 1,
     borderColor: theme.colors.outlineVariant,
     marginBottom: 12,
   },

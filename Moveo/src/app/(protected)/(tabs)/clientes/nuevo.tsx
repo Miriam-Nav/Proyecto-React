@@ -1,105 +1,153 @@
-import { Text, useTheme } from "react-native-paper";
-import { View, ScrollView, Alert } from "react-native";
-import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { View, ScrollView } from "react-native";
+import { ActivityIndicator, Text, useTheme, Snackbar } from "react-native-paper";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
-import { ControlledTextInput } from "../../../../components/ControlledTextInput";
+
+// Componentes y hooks
 import { ClienteFormValues, ClienteSchema } from "../../../../schemas/cliente.schema";
+import { useClienteDetalle, useUpdateClienteAccion, useCreateClienteAccion } from "../../../../hooks/useClientes";
+import { ControlledTextInput } from "../../../../components/ControlledTextInput";
+import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
+
+// Estilos
 import { commonStyles } from "../../../../styles/common.styles";
 import { formStyles } from "../../../../styles/form.styles";
-import { useNuevoClienteAccion } from "../../../../hooks/useClientes";
-import { useState } from "react";
 
-
-export default function NuevoCliente() {
+export default function ClienteFormScreen() {
   const router = useRouter();
   const theme = useTheme();
   const commonS = commonStyles(theme);
   const formS = formStyles(theme);
 
-  const { ejecutarCrear } = useNuevoClienteAccion();
-  const [cargando, setCargando] = useState(false);
+  // Detectar si es edición o creación
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const isEditing = !!id && id !== "nuevo";
+  const idNum = isEditing ? Number(id) : null;
 
-  const { control, handleSubmit, setError, formState: { errors } } = useForm<ClienteFormValues>({
+  // Hooks de acciones
+  const { ejecutarActualizar, cargando: actualizando } = useUpdateClienteAccion();
+  const { ejecutarCrear, cargando: creando } = useCreateClienteAccion();
+  const { data: cliente, isLoading: cargandoDatos } = useClienteDetalle(idNum ?? 0, {
+    enabled: isEditing,
+  });
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '', type: 'success' as 'success' | 'error' });
+
+  // Configuración del formulario con Hook Form
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<ClienteFormValues>({
     resolver: zodResolver(ClienteSchema),
     defaultValues: { nombre: "", email: "", telefono: "", direccion: "" },
   });
 
+  // Resetear el formulario cuando llegan los datos del cliente (Edición)
+  useEffect(() => {
+    if (isEditing && cliente) {
+      reset({
+        nombre: cliente.nombre || "",
+        email: cliente.email || "",
+        telefono: cliente.telefono || "",
+        direccion: cliente.direccion || "",
+      });
+    }
+  }, [cliente, isEditing]);
+
   const onSubmit = async (data: ClienteFormValues) => {
     try {
-      setCargando(true);
-      await ejecutarCrear({
-        ...data,
-        activo: true,
-        notas: ""
-      });
-      Alert.alert("Bien", `Cliente "${data.nombre}" creado correctamente`);
-      router.back();
-    } catch (error) {
-      if (error.message.includes("registrado") || error.message.includes("email")) {
-        setError("email", { type: "manual", message: error.message });
+      if (isEditing && idNum) {
+        await ejecutarActualizar(idNum, data);
+        setSnackbar({ visible: true, message: 'Cliente actualizado correctamente', type: 'success' });
       } else {
-        Alert.alert("Error", error.message);
+        await ejecutarCrear(data);
+        setSnackbar({ visible: true, message: 'Cliente creado correctamente', type: 'success' });
       }
-      console.log("Error: " + error.message);
-    } finally {
-      setCargando(false);
+      setTimeout(() => router.back(), 1500);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Ocurrió un fallo';
+      setSnackbar({ visible: true, message: errorMessage, type: 'error' });
     }
   };
 
-  return (
-    <ScrollView contentContainerStyle={[commonS.screen, {padding: 20, justifyContent: "center"}]}>
-      <View style={[formS.container]}>
-        <Text style={[commonS.sectionTitle, {textAlign: "center",}]}>Nuevo Cliente</Text>
+  // Pantalla de carga solo si se espera datos de un cliente existente
+  if (isEditing && cargandoDatos) {
+    return (
+      <View style={commonS.center}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
 
-        {/* -------- NOMBRE -------- */}
+  return (
+    <ScrollView style={commonS.screen} contentContainerStyle={{ paddingHorizontal: 0, paddingTop: 20, paddingBottom: 40 }}>
+      <View style={formS.container}>
+        <Text style={[commonS.sectionTitle, { textAlign: "center", marginBottom: 20 }]}>
+          {isEditing ? "Editar Cliente" : "Nuevo Cliente"}
+        </Text>
+
+        {/* NOMBRE */}
         <ControlledTextInput
           control={control}
           name="nombre"
-          placeholder="Nombre"
+          label="Nombre completo"
+          placeholder="Nombre y apellidos del cliente"
           errors={errors}
+          titleInput={true}
         />
 
-        {/* -------- EMAIL -------- */}
+        {/* EMAIL */}
         <ControlledTextInput
           control={control}
           name="email"
-          placeholder="Email"
+          label="Correo electrónico"
+          placeholder="ejemplo@correo.com"
           errors={errors}
+          titleInput={true}
         />
 
-        {/* -------- TELÉFONO -------- */}
+        {/* TELÉFONO */}
         <ControlledTextInput
           control={control}
           name="telefono"
-          placeholder="Teléfono"
+          label="Teléfono"
+          placeholder="Número de teléfono"
           errors={errors}
+          titleInput={true}
         />
 
-        {/* -------- DIRECCIÓN -------- */}
+        {/* DIRECCIÓN */}
         <ControlledTextInput
           control={control}
           name="direccion"
-          placeholder="Dirección"
+          label="Dirección"
+          placeholder="Dirección completa"
           errors={errors}
+          titleInput={true}
         />
 
-        {/* -------- BOTONES -------- */}
         <View style={formS.buttons}>
-          {/* handleSubmit valida con Zod y luego ejecuta onSubmit */}
           <PrimaryButton 
             onPress={handleSubmit(onSubmit)} 
-            text={cargando ? "Guardando..." : "Crear"}
+            text={actualizando || creando ? "Guardando..." : (isEditing ? "Actualizar" : "Crear")}
+            disabled={actualizando || creando}
           />
           
-          <SecondaryButton onPress={() => router.back()} text="Cancelar" />
+          <SecondaryButton 
+            onPress={() => router.back()} 
+            text="Cancelar" 
+            disabled={actualizando || creando}
+          />
         </View>
       </View>
+
+      <Snackbar
+        visible={snackbar.visible}
+        onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+        duration={3000}
+        wrapperStyle={{ width: '100%', alignSelf: 'center' }}
+        style={{ backgroundColor: snackbar.type === 'error' ? theme.colors.error : theme.colors.onError }}
+      >
+        {snackbar.message}
+      </Snackbar>
     </ScrollView>
   );
 }
-function setError(arg0: string, arg1: { type: string; message: any; }) {
-  throw new Error("Function not implemented.");
-}
-

@@ -21,7 +21,7 @@ export default function HomeScreen() {
   const isAdmin = role?.name === "ADMIN";
 
   // Obtener estadísticas con Realtime
-  const { alquileres = [], isLoading: loadingAlquileres } = useAlquileresRealtime();
+  const { data: alquileres = [], isLoading: loadingAlquileres } = useAlquileresRealtime();
   const { data: clientes = [], isLoading: loadingClientes } = useClientesRealtime();
   const { data: videojuegos = [], isLoading: loadingVideojuegos } = useVideojuegosRealtime();
 
@@ -73,7 +73,9 @@ export default function HomeScreen() {
             <IconButton
               icon="cog"
               size={28}
-              iconColor={theme.colors.primary}
+              mode="contained"
+              containerColor={theme.colors.outlineVariant}
+              iconColor={theme.colors.onTertiary}
               style={{ marginTop: 20 }}
               onPress={() => router.push("/(protected)/preferences")}
             />

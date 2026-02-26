@@ -5,16 +5,16 @@ export const logginStyles = (theme) => StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surfaceVariant,
     paddingVertical: 20,
   },
   containerLoggin: {
     width: "90%",
     maxWidth: 450,
     padding: 25,
-    backgroundColor: theme.colors.surfaceVariant,
+    backgroundColor: theme.colors.surface,
     borderRadius: 15,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: theme.colors.outlineVariant,
   },
   headerLoggin: {
@@ -36,7 +36,7 @@ export const logginStyles = (theme) => StyleSheet.create({
     fontFamily: "monospace",
   },
   inputOutlineLoggin: {
-    borderWidth: 3,
+    borderWidth: 1,
     borderColor: theme.colors.outlineVariant,
     borderRadius: 10,
   },
@@ -72,7 +72,7 @@ export const logginStyles = (theme) => StyleSheet.create({
   },
   googleButton: {
     marginBottom: 18,
-    borderWidth: 3,
+    borderWidth: 1,
     borderColor: theme.colors.primary,
     borderRadius: 10,
   },

@@ -4,6 +4,7 @@ import { useUserStore } from "../stores/userStore";
 import { supabase } from "../config/supabaseClient";
 import { fetchProfileByAuthId } from "../services/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Session } from "@supabase/supabase-js";
 
 // Evita que la pantalla de carga se quite antes de tiempo
 SplashScreen.preventAutoHideAsync();
@@ -42,7 +43,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         let isMounted = true;
 
         // Sincronizar el perfil de Supabase con la App
-        const syncProfile = async (session: any) => {
+        const syncProfile = async (session: Session | null) => {
             if (!session?.user?.id) {
                 clearUser();
                 setAuthUserId(null);
@@ -109,9 +110,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
                     clearUser();
                     setAuthUserId(null);
                 }
-            } catch (error: any) {
+            } catch (error: unknown) {
                 // Solo mostrar error si NO es el error común de refresh token
-                if (!error?.message?.includes('Refresh Token')) {
+                if (error instanceof Error && !error?.message?.includes('Refresh Token')) {
                     console.error("Error inicializando auth:", error);
                 }
                 
@@ -155,14 +156,19 @@ export function AuthProvider({ children }: PropsWithChildren) {
         };
     }, []);
 
-    // Ocultar SplashScreen cuando todo esté listo
+    // Ocultar SplashScreen cuando todo esté listo y navegación completa
     useEffect(() => {
         if (isAuthReady) {
-            SplashScreen.hideAsync().catch((error) => {
-                console.warn("Error ocultando splash:", error);
-            });
+            // Delay para asegurar que la navegación esté completa
+            const timer = setTimeout(() => {
+                SplashScreen.hideAsync().catch((error) => {
+                    console.warn("Error ocultando splash:", error);
+                });
+            }, 200);
+            
+            return () => clearTimeout(timer);
         }
-    }, [isAuthReady]);
+    }, [isAuthReady, isLoggedIn, segments]);
 
     // Timeout de seguridad: ocultar splash después de 5s máximo
     useEffect(() => {

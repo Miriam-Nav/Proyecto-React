@@ -24,60 +24,60 @@ export default function TabsLayout() {
         }
       }}
     >
-      <Tabs.Screen 
-        name="home" 
-        options={{ 
-          title: "Inicio",
-          tabBarIcon: ({ color, focused }) => (
-            <MaterialCommunityIcons 
-              name={focused ? "home" : "home-outline"} 
-              size={26} 
-              color={color} 
-            />
-          )
-        }} 
-      />
-      <Tabs.Screen 
-        name="videojuegos" 
-        options={{ 
-          title: "Videojuegos",
-          tabBarIcon: ({ color, focused }) => (
-            <MaterialCommunityIcons 
-              name={focused ? "gamepad-variant" : "gamepad-variant-outline"} 
-              size={26} 
-              color={color} 
-            />
-          )
-        }} 
-      />
-      <Tabs.Screen 
-        name="clientes" 
-        options={{ 
-          title: "Clientes",
-          href: isAdmin ? "/(protected)/(tabs)/clientes" : null,
-          tabBarIcon: ({ color, focused }) => (
-            <MaterialCommunityIcons 
-              name={focused ? "account-group" : "account-group-outline"} 
-              size={26} 
-              color={color} 
-            />
-          )
-        }} 
-      />
-      <Tabs.Screen 
-        name="alquileres" 
-        options={{ 
-          title: "Alquileres",
-          href: isAdmin ? "/(protected)/(tabs)/alquileres" : null,
-          tabBarIcon: ({ color, focused }) => (
-            <MaterialCommunityIcons 
-              name={focused ? "package-variant" : "package-variant-closed"} 
-              size={26} 
-              color={color} 
-            />
-          )
-        }} 
-      />
+    <Tabs.Screen 
+      name="home" 
+      options={{ 
+        title: "Inicio",
+        tabBarIcon: ({ color, focused }) => (
+          <MaterialCommunityIcons 
+            name={focused ? "home" : "home-outline"} 
+            size={26} 
+            color={color} 
+          />
+        )
+      }} 
+    />
+    <Tabs.Screen 
+      name="videojuegos" 
+      options={{ 
+        title: "Videojuegos",
+        tabBarIcon: ({ color, focused }) => (
+          <MaterialCommunityIcons 
+            name={focused ? "gamepad-variant" : "gamepad-variant-outline"} 
+            size={26} 
+            color={color} 
+          />
+        )
+      }} 
+    />
+    <Tabs.Screen 
+      name="clientes" 
+      options={{ 
+        title: "Clientes",
+        href: isAdmin ? "/(protected)/(tabs)/clientes" : null,
+        tabBarIcon: ({ color, focused }) => (
+          <MaterialCommunityIcons 
+            name={focused ? "account-group" : "account-group-outline"} 
+            size={26} 
+            color={color} 
+          />
+        )
+      }} 
+    />
+    <Tabs.Screen 
+      name="alquileres" 
+      options={{ 
+        title: "Alquileres",
+        href: isAdmin ? "/(protected)/(tabs)/alquileres" : null,
+        tabBarIcon: ({ color, focused }) => (
+          <MaterialCommunityIcons 
+            name={focused ? "package-variant" : "package-variant-closed"} 
+            size={26} 
+            color={color} 
+          />
+        )
+      }} 
+    />
     </Tabs>
   );
 }

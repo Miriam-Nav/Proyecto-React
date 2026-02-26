@@ -26,7 +26,7 @@ export default function PreferencesScreen() {
         <Text style={commonS.sectionTitle}>SELECCIÓN DE TEMA</Text>
 
         <RadioButton.Group 
-          onValueChange={value => setThemeMode(value as any)} 
+          onValueChange={value => setThemeMode(value as 'light' | 'dark' | 'system')} 
           value={themeMode}
         >
           {/* Claro */}

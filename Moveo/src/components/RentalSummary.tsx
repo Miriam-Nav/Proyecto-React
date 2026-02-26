@@ -29,6 +29,7 @@ export function RentalSummary({
           style={{
             fontSize: 16,
             fontWeight: "bold",
+            fontFamily: "monospace",
             color: theme.colors.onSurface,
             marginBottom: 12,
           }}
@@ -70,6 +71,7 @@ export function RentalSummary({
             style={{
               fontSize: 14,
               color: theme.colors.onSurfaceVariant,
+              fontFamily: "monospace"
             }}
           >
             Días de alquiler:
@@ -100,6 +102,7 @@ export function RentalSummary({
               fontSize: 16,
               fontWeight: "bold",
               color: theme.colors.onSurface,
+              fontFamily: "monospace",
             }}
           >
             Total a pagar:

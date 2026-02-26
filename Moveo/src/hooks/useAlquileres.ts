@@ -6,23 +6,29 @@ import { Alquiler } from "../types/Alquiler";
 import {
     alquileresQueryKey,
     getAllAlquileres,
+    getAlquilerById,
     createAlquiler,
+    updateAlquilerEstado,
+    updateAlquiler,
+    deleteAlquiler,
 } from "../services/alquilerService";
 
 // Hook con Realtime para pantalla de inicio
 export function useAlquileresRealtime() {
     const queryClient = useQueryClient();
 
-    const { data: alquileres = [], isLoading, error, refetch } = useQuery({
+    const result = useQuery({
         queryKey: alquileresQueryKey,
         queryFn: getAllAlquileres,
         refetchOnMount: 'always',
+        staleTime: 0,
         retry: 3,
     });
 
     // Suscripción al canal de Realtime
     useEffect(() => {
         const applyRealtimeChange = (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
+            console.log('Realtime alquileres - evento recibido:', payload.eventType);
             // Invalidar para refetch (incluye datos de joins)
             queryClient.invalidateQueries({ 
                 queryKey: alquileresQueryKey,
@@ -44,6 +50,11 @@ export function useAlquileresRealtime() {
             .subscribe((status) => {
                 if (status === 'SUBSCRIBED') {
                     console.log('Realtime alquileres CONECTADO');
+                } else if (status === 'CHANNEL_ERROR') {
+                    console.error('Error en canal Realtime alquileres');
+                    console.error('Verifica que ejecutaste: ALTER PUBLICATION supabase_realtime ADD TABLE alquileres;');
+                } else if (status === 'CLOSED') {
+                    console.warn('Canal Realtime alquileres CERRADO');
                 }
             });
 
@@ -52,29 +63,17 @@ export function useAlquileresRealtime() {
         };
     }, [queryClient]);
 
-    return {
-        alquileres,
-        isLoading,
-        error,
-        refetch,
-    };
+    return result;
 }
 
-// Hook para lista de alquileres
+// Hook para lista de alquileres (sin Realtime)
 export function useAlquileres() {
-    const { data: alquileres = [], isLoading, error, refetch } = useQuery({
+    return useQuery({
         queryKey: alquileresQueryKey,
         queryFn: getAllAlquileres,
         refetchOnMount: 'always',
         retry: 3,
     });
-
-    return {
-        alquileres,
-        isLoading,
-        error,
-        refetch,
-    };
 }
 
 // Hook para crear alquiler
@@ -83,6 +82,57 @@ export function useCreateAlquiler() {
 
     return useMutation({
         mutationFn: createAlquiler,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: alquileresQueryKey });
+        },
+    });
+}
+
+// Hook para obtener un alquiler por ID
+export function useAlquilerById(id: number) {
+    return useQuery({
+        queryKey: [...alquileresQueryKey, id],
+        queryFn: () => getAlquilerById(id),
+        enabled: !!id,
+        refetchOnMount: 'always',
+        retry: 3,
+    });
+}
+
+// Hook para actualizar estado de alquiler
+export function useUpdateAlquilerEstado() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, estado }: { id: number; estado: string }) => 
+            updateAlquilerEstado(id, estado),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: alquileresQueryKey });
+            queryClient.invalidateQueries({ queryKey: [...alquileresQueryKey, variables.id] });
+        },
+    });
+}
+
+// Hook para actualizar alquiler completo
+export function useUpdateAlquiler() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, payload }: { id: number; payload: Partial<Alquiler> }) => 
+            updateAlquiler(id, payload),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: alquileresQueryKey });
+            queryClient.invalidateQueries({ queryKey: [...alquileresQueryKey, variables.id] });
+        },
+    });
+}
+
+// Hook para eliminar alquiler
+export function useDeleteAlquiler() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: number) => deleteAlquiler(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: alquileresQueryKey });
         },

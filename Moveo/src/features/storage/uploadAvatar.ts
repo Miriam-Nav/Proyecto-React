@@ -60,7 +60,7 @@ export const uploadUserAvatar = async ({ userId, fileUri }: { userId: string, fi
     if (dbError) throw dbError;
 
     return updatedUser;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("ERROR EN UPLOAD SERVICE:", error);
   }
 };

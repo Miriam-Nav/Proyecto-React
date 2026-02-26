@@ -124,7 +124,6 @@ export default function LoginScreen() {
             name="email"
             placeholder="nombre@ejemplo.com"
             errors={errors}
-            leftIcon="email-outline"
           />
         </View>
 

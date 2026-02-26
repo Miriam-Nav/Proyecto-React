@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { View, Text, ActivityIndicator, ScrollView, Linking, Platform, Alert } from "react-native";
 import { useLocalSearchParams, Stack, useFocusEffect, router } from "expo-router";
-import { useTheme } from "react-native-paper";
+import { useTheme, Snackbar } from "react-native-paper";
 import { PrimaryButton, SecondaryButton } from "../../../../components/ButtonApp";
 import { InfoCard, InfoCardPedidos } from "../../../../components/CardApp";
 import { commonStyles } from "../../../../styles/common.styles";
@@ -12,6 +12,7 @@ import { useClienteDetalle, useClienteAlquileres, useDeleteClienteAccion } from 
 import * as ImagePicker from "expo-image-picker";
 import { Avatar, IconButton } from "react-native-paper";
 import { uploadClienteAvatar } from "../../../../services/clienteService";
+import { useConfirmDialog } from "../../../../hooks/useConfirmDialog";
 
 
 export default function ClienteDetalle() {
@@ -28,6 +29,8 @@ export default function ClienteDetalle() {
   const { ejecutarEliminar } = useDeleteClienteAccion(); 
   const [borrando, setBorrando] = useState(false);
   const [subiendoImagen, setSubiendoImagen] = useState(false);
+  const { show: showConfirmDialog, ConfirmDialog } = useConfirmDialog();
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '', type: 'success' });
 
   const handlePickFromGallery = async () => {
     // Pedir permisos
@@ -255,7 +258,7 @@ export default function ClienteDetalle() {
           {/* EDITAR */}
           <PrimaryButton onPress={() => {
               router.push({
-                pathname: "/clientes/editar",
+                pathname: "/clientes/nuevo",
                 params: { id: cliente.id }
               });
             }} text="Editar" 
@@ -272,37 +275,43 @@ export default function ClienteDetalle() {
 
           {/* ELIMINAR */}
           <PrimaryButton 
-            onPress={async () => {
-              Alert.alert(
-                "Confirmar eliminación",
-                `¿Seguro que quieres eliminar a "${cliente?.nombre}"?`,
-                [
-                  { text: "Cancelar", style: "cancel" },
-                  {
-                    text: "Eliminar",
-                    style: "destructive",
-                    onPress: async () => {
-                      try {
-                        setBorrando(true);
-                        await ejecutarEliminar(idNum);
-                        Alert.alert("Bien", `Cliente "${cliente?.nombre}" eliminado correctamente`);
-                        router.back();
-                      } catch (e) {
-                        const mensaje = e instanceof Error ? e.message : "No se pudo eliminar";
-                        Alert.alert("Error", mensaje);
-                      } finally {
-                        setBorrando(false);
-                      }
-                    }
+            onPress={() => {
+              showConfirmDialog({
+                title: "Confirmar eliminación",
+                message: `¿Seguro que quieres eliminar a "${cliente?.nombre}"?`,
+                confirmText: "Eliminar",
+                onConfirm: async () => {
+                  try {
+                    setBorrando(true);
+                    await ejecutarEliminar(idNum);
+                    setSnackbar({ visible: true, message: `Cliente "${cliente?.nombre}" eliminado`, type: 'success' });
+                    setTimeout(() => router.back(), 1000);
+                  } catch (e) {
+                    const mensaje = e instanceof Error ? e.message : "No se pudo eliminar";
+                    setSnackbar({ visible: true, message: mensaje, type: 'error' });
+                  } finally {
+                    setBorrando(false);
                   }
-                ]
-              );
+                }
+              });
             }} 
             text={borrando ? "Eliminando..." : "Eliminar"}
             color={theme.colors.error}
           />
         </View>
       </ScrollView>
+
+      <ConfirmDialog />
+      
+      <Snackbar
+        visible={snackbar.visible}
+        onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+        duration={3000}
+        wrapperStyle={{ width: '100%', alignSelf: 'center' }}
+        style={{ backgroundColor: snackbar.type === 'error' ? theme.colors.error : theme.colors.onError }}
+      >
+        {snackbar.message}
+      </Snackbar>
     </View>
   );
 }

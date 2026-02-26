@@ -86,6 +86,26 @@ export const updateAlquilerEstado = async (id: number, estado: string): Promise<
     if (error) throw new Error("No se pudo actualizar el estado del alquiler.");
 };
 
+// Actualizar alquiler completo
+export const updateAlquiler = async (id: number, payload: Partial<Alquiler>): Promise<Alquiler> => {
+    // Eliminar campos que no deben actualizarse (created_at, relaciones)
+    const { created_at, videojuego, cliente, ...cleanPayload } = payload as any;
+    
+    const { data, error } = await supabase
+        .from("alquileres")
+        .update(cleanPayload)
+        .eq("id", id)
+        .select(`
+            *,
+            videojuego:videojuegos(*),
+            cliente:clientes(id, nombre, email, telefono, avatar_url)
+        `)
+        .single();
+
+    if (error) throw new Error(error.message || "No se pudo actualizar el alquiler.");
+    return data as Alquiler;
+};
+
 // Eliminar alquiler
 export const deleteAlquiler = async (id: number): Promise<void> => {
     const { error } = await supabase

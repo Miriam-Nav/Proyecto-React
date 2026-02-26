@@ -12,7 +12,7 @@ export default function AlquileresScreen() {
   const commonS = commonStyles(theme);
   const clientS = clientStyles(theme);
 
-  const { alquileres, isLoading, error, refetch } = useAlquileres();
+  const { data: alquileres = [], isLoading, error, refetch } = useAlquileres();
 
   // Refresca los datos cada vez que la pantalla vuelve a estar en foco
   useFocusEffect(
@@ -45,7 +45,7 @@ export default function AlquileresScreen() {
     <View style={commonS.screen}>
       {/* HEADER */}
       <View style={commonS.header}>
-        <Text style={commonS.headerTitle}>GESTIÓN DE ALQUILERES</Text>
+        <Text style={commonS.headerTitle}>ALQUILERES</Text>
         <Text style={commonS.headerSubtitle}>
           {alquileres.length} alquiler{alquileres.length !== 1 ? "es" : ""} registrado{alquileres.length !== 1 ? "s" : ""}
         </Text>
@@ -70,11 +70,13 @@ export default function AlquileresScreen() {
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <InfoCardAlquiler 
+                id={item.id}
                 tituloVideojuego={item.videojuego?.titulo || "Desconocido"}
                 nombreCliente={item.cliente?.nombre || "Desconocido"}
                 fechaInicio={new Date(item.fecha_inicio).toLocaleDateString()}
                 fechaFin={new Date(item.fecha_fin_prevista).toLocaleDateString()}
                 estado={item.estado}
+                monto={item.total_pagado}
               />
             )}
             contentContainerStyle={{ paddingBottom: 20 }}

@@ -12,23 +12,8 @@ export default function AlquileresLayout() {
     >
       <Stack.Screen
         name="index"
-        options={{
-          title: "Alquileres",
-        }}
       />
-      <Stack.Screen
-        name="nuevo"
-        options={{
-          title: "Nuevo Alquiler",
-          presentation: "modal",
-        }}
-      />
-      <Stack.Screen
-        name="videojuegos"
-        options={{
-          title: "Catálogo de Videojuegos",
-        }}
-      />
+      <Stack.Screen name="nuevo"/>
     </Stack>
   );
 }

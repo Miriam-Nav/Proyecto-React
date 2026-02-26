@@ -5,7 +5,7 @@ export const formStyles = (theme) => StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: 12,
     padding: 20,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: theme.colors.outlineVariant,
     margin: 20,
   },
