@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moveo - Tutorial de Uso</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Moveo: Guía de Puesta en Marcha y Uso</h1>
+        <p>Pasos para instalar, configurar y ejecutar la aplicación en entorno de desarrollo.</p>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="tutorial.html">Tutorial de Uso</a>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Puesta en marcha</h2>
+            <ol>
+                <li>Clonar el repositorio: <code>git clone https://github.com/Miriam-Nav/Proyecto-React.git</code></li>
+                <li>Instalar las dependencias del proyecto: <code>npm install</code></li>
+                <li>Crear el archivo <code>.env</code> a partir de <code>.env.example</code> y añadir las credenciales de Supabase:
+                    <br><code>EXPO_PUBLIC_SUPABASE_URL=tu_url</code>
+                    <br><code>EXPO_PUBLIC_SUPABASE_ANON_KEY=tu_key</code>
+                </li>
+                <li>Iniciar el servidor de desarrollo: <code>npx expo start</code></li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Flujo de trabajo en la aplicación</h2>
+            <ul>
+                <li><strong>Autenticación:</strong> Iniciar sesión o registrar un nuevo usuario mediante Supabase Auth.</li>
+                <li><strong>Gestión de catálogo:</strong> Consultar y dar de alta videojuegos comprobando el stock en tiempo real.</li>
+                <li><strong>Registro de alquileres:</strong> Seleccionar cliente y título; el sistema calcula los días y actualiza automáticamente el inventario disponible.</li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html>
